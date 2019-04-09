@@ -193,6 +193,9 @@ a.article:hover {
     padding-inline-start: 0px;
     padding: 0 10px
 }
+.messagesGroup>ul{
+    padding-inline-start: 0px;
+}
 .messagesGroup-header{
     display: flex;
     align-items: center;
@@ -302,17 +305,26 @@ margin-top: 5px;
 /*----------------------------------------
     MessageList
 --------------------------------------------------*/
+#messageList {
+    height: 87%;
+    overflow: auto;
+}
+
 #messageList .tools {
     padding-left: 5%;
-    min-width: 25%;
+    min-width: 120px;
 }
 
 /*----------------------------------------
     CharacterList
 --------------------------------------------------*/
+.characterList {
+    height: 87%;
+    overflow: auto;
+}
 .characterList .tools {
     padding-left: 5%;
-    min-width: 25%;
+    min-width: 120px;
 }
 /* ---------------------------------------------------
     MEDIAQUERIES

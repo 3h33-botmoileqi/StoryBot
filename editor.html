@@ -15,10 +15,6 @@
 	    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 	    <!-- Tempus Dominus css -->
 	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
-</head>
-	    <!-- Font Awesome JS -->
-	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
-	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 	</head>
 	<body data-__gyazo-extension-added-paste-support="true">
 	    <div class="wrapper">
@@ -64,7 +60,9 @@
 		        				</ul>
 		        			</div>
 		        			<div style="width: 40%">
-				        		<form>
+				        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
+				        			<input type="text" name="messageId" hidden>
+				        			<input type="checkbox" name="isNew" hidden>
 				        			<div class="form-group">
 				        				<label>Personnage :</label>
 				        				<select class="form-control characterList" name="character"></select>
@@ -72,18 +70,48 @@
 		        					<div class="form-group">
 			        					<label>Coté du chat :</label>
 			        					<div class="form-check form-check-inline">
-										  <input class="form-check-input" type="radio" name="defaultSide" value="left">
+										  <input class="form-check-input" type="radio" name="side" value="left">
 										  <label class="form-check-label" for="inlineRadio1">Gauche</label>
 										</div>
 										<div class="form-check form-check-inline">
-										  <input class="form-check-input" type="radio" name="defaultSide" value="right">
+										  <input class="form-check-input" type="radio" name="side" value="right">
 										  <label class="form-check-label" for="inlineRadio2">Droit</label>
 										</div>
 									</div>
-									<div class="form-group">
-		        						<div id="message-Editor" class="form-control" style="height: 25%" oninput="textInput.value = quill.root.innerHTML; console.log(quill.root.innerHTML)"></div>
-		        						<input type="text" id="textInput" name="text" hidden>
+
+		        					<div class="form-group">
+			        					<label>Contenu :</label>
+			        					<div class="form-check form-check-inline">
+										  <input class="form-check-input" type="radio" name="content" value="text" onclick="$('#mediaPayload').hide();$('#textPayload').show()">
+										  <label class="form-check-label" for="inlineRadio1">Texte</label>
+										</div>
+										<div class="form-check form-check-inline">
+										  <input class="form-check-input" type="radio" name="content" value="media" onclick="$('#mediaPayload').show();$('#textPayload').hide()">
+										  <label class="form-check-label" for="inlineRadio2">Media</label>
+										</div>
+									</div>
+									<div id="textPayload" class="form-group">
+		        						<div id="message-Editor" class="form-control" style="height: 25%"></div>
 		        					</div>
+		        					<div id="mediaPayload" class="form-group" style="display: none">
+			        					<label>Type :</label>
+			        					<div class="form-check form-check-inline">
+										  <input class="form-check-input" type="radio" name="payload-type" value="image">
+										  <label class="form-check-label" for="inlineRadio1">Image</label>
+										</div>
+										<div class="form-check form-check-inline">
+										  <input class="form-check-input" type="radio" name="payload-type" value="video">
+										  <label class="form-check-label" for="inlineRadio2">Video</label>
+										</div>
+										<div class="form-check form-check-inline">
+										  <input class="form-check-input" type="radio" name="payload-type" value="audio">
+										  <label class="form-check-label" for="inlineRadio3">Audio</label>
+										</div>
+										<div class="form-group">
+											<label>URL :</label>
+											<input type="text" name="payload-url">
+										</div>
+									</div>
 		        					<div class="form-group">
 										<label>Date & Heure :</label>
 						                <div class="input-group date" id="messageForm-datetimepicker" data-target-input="nearest">
@@ -98,15 +126,15 @@
 										
 										<input type="range" class="form-control-range" id="delayInput" name="delay" oninput="delayOutput.value = delayInput.value + ' sec'" value="0" min="0" max="60">
 			        					<div class="form-check">
-										  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1">
+										  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
 										  <label class="form-check-label" for="defaultCheck1">
 										  	Touch pour continuer
 										  </label>
 										</div>
 										<div class="form-check">
-										  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2">
+										  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" name="adsFlag">
 										  <label class="form-check-label" for="defaultCheck2">
-										    Avertissement Placement de produit
+										    Avertissement placement de produit
 										  </label>
 										</div>
 									</div>
@@ -147,14 +175,14 @@
 		        			</div>
 		        		</div>
 			        </div>
-			        <div id="configPanel" class="page" style="display: none;padding: 50px;">
+			        <div id="configPanel" class="page" style="display: none;padding: 25px;">
 			        	
 			        </div>
 	        	</div>
 	        </div>
 	    </div>
-	    <!-- jQuery CDN - Slim version (=without AJAX) -->
-	    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+	    <!-- jQuery CDN -->
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 	    <!-- Popper.JS -->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
 	    <!-- Bootstrap JS -->
@@ -169,6 +197,9 @@
 	    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/js/tempusdominus-bootstrap-4.min.js"></script>
 	    <!-- Socket.io JS-->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+	    <!-- Font Awesome JS -->
+	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 	    <!-- Custom JS -->
 	    <script type="text/javascript">
 	        $(document).ready(function () {

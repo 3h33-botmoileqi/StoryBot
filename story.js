@@ -58,10 +58,11 @@ class Story {
 	        					${this.config.displaycharacterName ? `<h6>${lastCharacter}</h6>` : ""}
 	        				</div>
 	        			</div>
+	        			<ul></ul>
 	        		</li>`);
 	        	$(this.chatElement).append(messagesGroup);
 	        }
-	        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), messagesGroup);
+	        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
 	        $("body").scrollTop($("body").prop('scrollHeight'));
 	        this.id++;
 	      }
@@ -78,7 +79,7 @@ class Story {
 	}
 
 	GetMessageElementById(id){
-		return $(`#chat .message:nth-child(${id+1})`)
+		return $(`#chat .message`).get(id);
 	}
 
 	insertMessageElement(message, parent,id=null){
@@ -88,18 +89,25 @@ class Story {
 
 		}
         if(this.editor){
-	        $(message).find('.messageEdit').click(function(){$('.page').hide();$('#messagePanel').show();editor.LoadSelectedMessage(editor.GetIdByMessageElement(message));});
-	        $(message).find('.messageDelete').click(function(){editor.DeleteMessageElement(message)});
-	        $(message).find('.text').on('input',function(){editor.EditMessageElement(message, $(this).text())});
+        	this.bindMessageEvent(message);
         }
 	}
 
-	EditMessageElement(message, text){
-		this.conversation[this.GetIdByMessageElement($(message))].text = text;
+	bindMessageEvent(message){
+        $(message).find('.messageEdit').click(function(){$('.page').hide();$('#messagePanel').show();editor.LoadSelectedMessage(editor.GetIdByMessageElement(message));});
+        $(message).find('.messageDelete').click(function(){editor.DeleteMessageEditor(editor.GetIdByMessageElement(message))});
+        $(message).find('.text').on('input',function(){editor.onMessageInput(message, $(this).text())});
+	}
+
+	EditMessageElement(message, newMessage){
+		let newMessageElement = $(newMessage.toDOM(this.editor));
+		$(message).replaceWith(newMessageElement);
+		this.bindMessageEvent(newMessageElement);
+    	this.conversation.splice(this.GetIdByMessageElement(message), 1, newMessage);
 	}
 
 	DeleteMessageElement(message){
-		var messagesGroup = $(message).parent();
+		var messagesGroup = $(message).closest(".messagesGroup");
 		if($(messagesGroup).children().length == 2){
 			$(messagesGroup).remove();
 		}
@@ -109,7 +117,7 @@ class Story {
     	this.conversation.splice(this.GetIdByMessageElement(message), 1);
 	}
 
-	EditMessage(message, text){
+	onMessageInput(message, text){
 		this.conversation[this.GetIdByMessageElement($(message))].text = text;
 	}
 
@@ -136,7 +144,7 @@ class Story {
 		this.characters = {"Personnage1":{"avatar":"https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48","side":"left"},"Personnage2":{"avatar":"https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg","side":"right"},"Personnage3":{"avatar":"https://yt3.ggpht.com/a-/AN66SAyjHOM6XYXi_WmTK5F3GJ0pu3G5nQg1gVS4aA=s48-c-k-c0xffffffff-no-rj-mo","side":"left"}}
 		var conversation = [{"character":"Personnage1","timestamp":1521374361,"text":"Bonjour !","payload":{},"delay":0,"tapeFlag":false, "side":"left"},{"character":"Personnage2","timestamp":1521374361,"text":"Hey, comment ça va ?","payload":{},"delay":2000,"tapeFlag":false, "side":"right"},{"character":"Personnage1","timestamp":1521374361,"text":"Très bien ! Regarde mon nouveau Poster !","payload":{},"delay":1000,"tapeFlag":false, "side":"left"},{"character":"Personnage1","timestamp":1521374361,"text":"","payload":{"type":"image","url":"https://images.pexels.com/photos/799443/pexels-photo-799443.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"},"delay":2000,"tapeFlag":false, "side":"left"},{"character":"Personnage3","timestamp":1521374361,"text":"C'est ma photo !","payload":{},"delay":1000,"tapeFlag":false, "side":"left"},{"character":"Personnage2","timestamp":1521374361,"text":"Bravo vous deux !","payload":{},"delay":2000,"tapeFlag":false, "side":"right"},{"character":"Personnage2","timestamp":1521374361,"text":"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.","payload":{},"delay":0,"tapeFlag":false, "side":"right"}];
 		for(var message of conversation){
-			this.conversation.push(new Message(message.character, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false, message.side))
+			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false))
 		}
 		this.generateMessagesGroup();
 		this.log();
@@ -144,7 +152,7 @@ class Story {
 }
 
 class Message{
-	constructor(characterName, text, payload, timestamp, delay, tapeFlag, ads, side){
+	constructor(characterName, side, text, payload, timestamp, delay, tapeFlag, ads){
 		this.character = characterName;
 		this.text = text;
 		this.payload = payload;
@@ -254,24 +262,108 @@ class Editor extends Story{
 	}
 
 	loadMessages(){
-		for(let message of this.conversation){
-			console.log(message);
-			$("#messageList").append(`
-				<li class="list-group-item d-flex justify-content-between align-items-center">
-					${message.text ? message.text : message.payload.type}
-					<div class="tools">
-						<button class="btn btn-secondary"><i class="fas <fa-></fa->edit"></i></button>
-						<button class="btn btn-secondary"><i class="fas fa-times"></i></button>
-					</div>
-				</li>
-				`);
+		this.conversation.forEach(function(message, index){
+			let messageItem = editor.messageItemDom(message);
+			$("#messageList").append(messageItem);
+	        $(messageItem).find('.messageEdit').click(function(){editor.LoadSelectedMessage(index);});
+	        $(messageItem).find('.messageDelete').click(function(){editor.DeleteMessageEditor(index)});
+		});
+	}
+	messageItemDom(message){
+		return $(`
+			<li class="list-group-item d-flex justify-content-between align-items-center">
+				${message.text ? message.text : message.payload.type}
+				<div class="tools">
+					<button class="btn btn-secondary messageEdit"><i class="fas fa-edit"></i></button>
+					<button class="btn btn-secondary messageDelete"><i class="fas fa-times"></i></button>
+				</div>
+			</li>
+			`);
+	}
+
+	messageFormSubmit(){
+		let msgForm = document.forms["messageForm"];
+		let isNew = msgForm["isNew"].value;
+		let id = msgForm["messageId"].value;
+		let message = new Message(
+			msgForm["character"].value,
+			msgForm["side"].value,
+			$(quill.root.innerHTML).html(),
+			{type:msgForm["payload-type"].value, url:msgForm["payload-url"].value},
+			new Date(msgForm["datetime"].value).getTime() /1000,
+			msgForm["delay"].value * 1000,
+			msgForm["tapeFlag"].value,
+			msgForm["adsFlag"].value
+			);
+		console.log(isNew);
+		if(isNew === "true"){
+			console.log("insert");
+			this.insertMessageEditor(id, message);	
+		}else{
+			console.log("edit");
+			this.editMessageEditor(id, message);
 		}
 	}
 
-	LoadSelectedMessage(){
+	insertMessageEditor(){
+
+	}
+
+	editMessageEditor(id, message){
+		console.log("edition id:"+id);
+		console.log(message);
+		this.EditMessageElement($(`#chat .message`).get(id),message)
+		$(`#messageList>li:nth-child(${id+1})`).replaceWith(this.messageItemDom(message));
+	}
+
+	DeleteMessageEditor(id){
+		$(`#messageList>li:nth-child(${id+1})`).remove();
+		this.DeleteMessageElement($(`#chat .message`).get(id));
+	}
+
+	LoadSelectedMessage(id, isNew = false){
 		//TODO
 		//Charger le message dans le formulaire de message
+		console.log("load message id:"+id)
+		let msgForm = document.forms["messageForm"];
+		msgForm["messageId"].value = id;
+		msgForm["isNew"].value = isNew;
+		//INIT FORM
+		msgForm["character"].value = "";
+		$('#textPayload').show();
+		$('#mediaPayload').hide();
+		msgForm["payload-type"].value = "";
+		msgForm["payload-url"].value= "";
+		quill.root.innerHTML = "";
+		$('#messageForm-datetimepicker').datetimepicker('date', new Date());
+		msgForm["delay"].value = 0;
+		msgForm["tapeFlag"].value = false;
+		msgForm["adsFlag"].value = false;
+		if(!isNew){
+			let msg = this.conversation[id];
+			msgForm["character"].value = msg.character;
+			msgForm["side"].value = msg.side;
+			if(msg.text !== ""){
+
+				msgForm["content"].value = "text"; 
+				quill.root.innerHTML = msg.text;
+			}
+			else{
+				$('#textPayload').hide();
+				$('#mediaPayload').show();
+
+				msgForm["content"].value = "media"; 
+				msgForm["payload-type"].value = msg.payload.type;
+				msgForm["payload-url"].value = msg.payload.url;
+			}
+			$('#messageForm-datetimepicker').datetimepicker('date', new Date(msg.timestamp*1000));
+			msgForm["delay"].value = msg.delay/1000;
+			$("#delayOutput").text(msgForm["delay"].value+" sec");
+			msgForm["tapeFlag"].value = msg.tapeFlag;
+			msgForm["adsFlag"].value = msg.ads;
+		}
 	}
 
 	//TODO Delete / Edition fonction & event pour Character & Message
+	//TODO Scroll to messageId
 }
