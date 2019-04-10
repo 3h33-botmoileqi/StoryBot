@@ -3,7 +3,7 @@ var quill = new Quill('#message-editor', {
 });
 
 $(function () {
-	$('#messageForm-datetimepicker').datetimepicker({date:new Date});
+	$('#datetimepicker1').datetimepicker({date:new Date, locale: 'fr', icons:{time:"fa fa-clock", date:"fa fa-calendar-alt"}});
 });
 
 let editor;
