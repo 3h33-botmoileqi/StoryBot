@@ -54,10 +54,9 @@ class Story {
 	        	$(this.chatElement).append(messagesGroup);
 	        }
 	        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
-	        //$("#mainContent").scrollTop($("#mainContent").prop('scrollHeight'));
+	        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
 	        var page = $(this).attr('href'); // Page cible
-			var speed = 300; // Durée de l'animation (en ms)
-	        await this.waitFor(100);
+			var speed = 400; // Durée de l'animation (en ms)
 			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
 	        this.id++;
 	      }
