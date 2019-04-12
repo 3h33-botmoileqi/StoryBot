@@ -175,6 +175,7 @@ a.article:hover {
 .page {
     overflow: auto;
     height: 92vh;
+    height: calc(var(--vh, 1vh) * 92);
     padding: 25px;
 }
 @media (max-width: 768px) {
@@ -387,12 +388,12 @@ a.article:hover {
 ---------------------------------------------------------*/
 
 .messagesGroup{
-  animation: animateElement ease-out .75s;
+  animation: animateElement ease-out .5s;
   animation-iteration-count: 1;
 }
 
 .message{
-  animation: animateElement ease-out .75s;
+  animation: animateElement ease-out .5s;
   animation-iteration-count: 1;
 }
 
