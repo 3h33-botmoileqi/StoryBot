@@ -57,6 +57,7 @@ class Story {
 	        //$("#mainContent").scrollTop($("#mainContent").prop('scrollHeight'));
 	        var page = $(this).attr('href'); // Page cible
 			var speed = 750; // Durée de l'animation (en ms)
+	        await this.waitFor(100);
 			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
 	        this.id++;
 	      }
