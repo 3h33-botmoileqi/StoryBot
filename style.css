@@ -178,6 +178,21 @@ a.article:hover {
     height: calc(var(--vh, 1vh) * 92);
     padding: 25px;
 }
+
+.page{
+  animation: pageShow ease-out .75s;
+  animation-iteration-count: 1;
+}
+
+@keyframes pageShow{
+  0% {
+    opacity:0;
+  }
+  100% {
+    opacity:1;
+  }
+}
+
 @media (max-width: 768px) {
     .page {
         padding: 10px;
@@ -213,7 +228,8 @@ a.article:hover {
     /* height: 60px; */
     position: absolute;
     left: 50%;
-    transform: translate(-50%,0);
+    z-index: 1020;
+    transform: translate(-50%,-71%);
     border: black 1px solid;
     padding: 5px;
     border-radius: 5%;
@@ -358,7 +374,7 @@ a.article:hover {
 }
 
 #messageList .text{
-    padding-left: 5%;
+    padding-left: 5vh;
 }
 /*----------------------------------------
     CharacterList

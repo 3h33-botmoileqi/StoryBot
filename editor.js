@@ -7,9 +7,14 @@ $(function () {
 });
 
 let editor;
-$(document).ready(function () {
+$(document).ready(function () {//Height adjust
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
+    window.addEventListener('resize', () => {
+      // We execute the same script as before
+      let vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    });
 	editor = new Editor($('#chat'), $(".characterList"));
 	editor.loadEditor();
 	editor.playStory();

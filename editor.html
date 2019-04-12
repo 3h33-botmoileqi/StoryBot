@@ -46,8 +46,8 @@
 	                    	</ul>-->
 	                    	<div class="nav ml-auto btn-group ">
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#chatPanel').show();editor.StartStoryEditor();"><i class="fas fa-eye"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#messagePanel').show()"><i class="fas fa-comments"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#characterPanel').show()"><i class="fas fa-users"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#messagePanel').show();"><i class="fas fa-comments"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#characterPanel').show();"><i class="fas fa-users"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#configPanel').show()"><i class="fas fa-cogs"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#sharePanel').show()"><i class="fas fa-share-alt"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#cloudPanel').show()"><i class="fas fa-cloud"></i></button>
@@ -58,7 +58,7 @@
 	            <div id="mainContent">
 	            	<div id="chatPanel" class="page">
 	            		<div class="editorMode">
-	            			<label>Visualisation</label>
+	            			Visualisation
 	            			<div class="form-check">
 							  <input class="form-check-input" type="radio" name="editorMode" value="true" onchange="editor.editor=true;editor.StartStoryEditor()" checked>
 							  <label class="form-check-label">
@@ -74,134 +74,130 @@
 	            		</div>
 		            	<ul id="chat" style="/*background:grey;width:100%;height:3000px*/"></ul>
 		        	</div>
-		        	<div id="messagePanel" class="page"  style="display: none;">
-	        			<div id="messageListContainer">
-	        				<div  class="d-flex">
-	        					<input type="text" name="messageFilter" placeholder="Recherche..." style="width: 100%">
-	        					<button class="btn-dark" onclick="editor.LoadSelectedMessage(editor.conversation.length, true);"><i class="fas fa-plus"></i></button>
-	        				</div>
-	        				<ul id="messageList" class="list-group">
-	        					
-	        				</ul>
-	        			</div>
-	        			<div id="messageFormContainer" style="display: none;">
-	        				<div style="right: 2%;position: absolute;"><button class="btn btn-danger" onclick="$('#messageListContainer').show();$('#messageFormContainer').hide();"><i class="fas fa-times"></i></button></div>
-			        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
-			        			<input type="text" name="messageId" hidden>
-			        			<input type="checkbox" name="isNew" hidden>
-			        			<div class="form-group">
-			        				<label>Personnage :</label>
-			        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide"></select>
-			        			</div>
-	        					<div class="form-group">
-		        					<label>Coté du chat :</label>
-		        					<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="side" value="left">
-									  <label class="form-check-label" for="inlineRadio1">Gauche</label>
-									</div>
-									<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="side" value="right">
-									  <label class="form-check-label" for="inlineRadio2">Droit</label>
-									</div>
-		        					<label>Contenu :</label>
-		        					<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="content" value="text" onclick="$('#mediaPayload').hide();$('#textPayload').show()">
-									  <label class="form-check-label" for="inlineRadio1">Texte</label>
-									</div>
-									<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="content" value="media" onclick="$('#mediaPayload').show();$('#textPayload').hide()">
-									  <label class="form-check-label" for="inlineRadio2">Media</label>
-									</div>
+        			<div  id="messagePanel" class="page messageListContainer" style="display: none;">
+        				<div  class="d-flex">
+        					<input type="text" name="messageFilter" placeholder="Recherche..." style="width: 100%">
+        					<button class="btn-dark" onclick="editor.LoadSelectedMessage(editor.conversation.length, true);"><i class="fas fa-plus"></i></button>
+        				</div>
+        				<ul id="messageList" class="list-group">
+        					
+        				</ul>
+        			</div>
+        			<div class="page messageFormContainer" style="display: none;">
+        				<div style="right: 2%;position: absolute;"><button class="btn btn-danger" onclick="$('.messageListContainer').show();$('.messageFormContainer').hide();"><i class="fas fa-times"></i></button></div>
+		        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
+		        			<input type="text" name="messageId" hidden>
+		        			<input type="checkbox" name="isNew" hidden>
+		        			<div class="form-group">
+		        				<label>Personnage :</label>
+		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide"></select>
+		        			</div>
+        					<div class="form-group">
+	        					<label>Coté du chat :</label>
+	        					<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="side" value="left">
+								  <label class="form-check-label" for="inlineRadio1">Gauche</label>
 								</div>
-								<div id="textPayload" class="form-group">
-	        						<div id="message-Editor" class="form-control" style="height: 25%"></div>
-	        					</div>
-	        					<div id="mediaPayload" class="form-group" style="display: none">
-		        					<label>Type :</label>
-		        					<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="payload-type" value="image">
-									  <label class="form-check-label" for="inlineRadio1">Image</label>
-									</div>
-									<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="payload-type" value="video">
-									  <label class="form-check-label" for="inlineRadio2">Video</label>
-									</div>
-									<div class="form-check form-check-inline">
-									  <input class="form-check-input" type="radio" name="payload-type" value="audio">
-									  <label class="form-check-label" for="inlineRadio3">Audio</label>
-									</div>
-									<div class="form-group">
-										<label>URL :</label>
-										<input type="text" name="payload-url">
-									</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="side" value="right">
+								  <label class="form-check-label" for="inlineRadio2">Droit</label>
 								</div>
-	        					<div class="form-group">
-									<label>Date & Heure :</label>
-					                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
-					                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" name="datetime"/>
-					                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-					                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-					                    </div>
-					                </div>
-	        					</div>
+	        					<label>Contenu :</label>
+	        					<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="content" value="text" onclick="$('#mediaPayload').hide();$('#textPayload').show()">
+								  <label class="form-check-label" for="inlineRadio1">Texte</label>
+								</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="content" value="media" onclick="$('#mediaPayload').show();$('#textPayload').hide()">
+								  <label class="form-check-label" for="inlineRadio2">Media</label>
+								</div>
+							</div>
+							<div id="textPayload" class="form-group">
+        						<div id="message-Editor" class="form-control" style="height: 25%"></div>
+        					</div>
+        					<div id="mediaPayload" class="form-group" style="display: none">
+	        					<label>Type :</label>
+	        					<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="payload-type" value="image">
+								  <label class="form-check-label" for="inlineRadio1">Image</label>
+								</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="payload-type" value="video">
+								  <label class="form-check-label" for="inlineRadio2">Video</label>
+								</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="payload-type" value="audio">
+								  <label class="form-check-label" for="inlineRadio3">Audio</label>
+								</div>
 								<div class="form-group">
-									<label for="formControlRange">Délai : <output id="delayOutput">0 sec</output></label>
-									
-									<input type="range" class="form-control-range" id="delayInput" name="delay" oninput="delayOutput.value = delayInput.value + ' sec'" value="0" min="0" max="60">
-		        					<div class="form-check">
-									  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
-									  <label class="form-check-label" for="defaultCheck1">
-									  	Touch pour continuer
-									  </label>
-									</div>
-									<div class="form-check">
-									  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" name="adsFlag">
-									  <label class="form-check-label" for="defaultCheck2">
-									    Avertissement placement de produit
-									  </label>
-									</div>
+									<label>URL :</label>
+									<input type="text" name="payload-url">
 								</div>
-								<button type="submit" class="btn btn-primary">Enregistrer</button>
-			        		</form>
-	        			</div>
-		        	</div>
-		        	<div id="characterPanel" class="page" style="display: none;">
-		        		<div class="d-flex justify-content-around">
-		        			<div class="characterListContainer">
-		        				<div  class="d-flex">
-		        					<input type="text" name="characterFilter" placeholder="Recherche..." style="width: 100%">
-		        					<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);"><i class="fas fa-plus"></i></button>
-		        				</div>
-		        				<ul id="mainCharacterList" class="list-group characterList">
-		        					
-		        				</ul>
-		        			</div>
-		        			<div class="characterFormContainer" style="display: none;>
-		        				<form name="characterForm" onsubmit="editor.characterFormSubmit();return false;">
-				        			<input type="text" name="characterName" hidden>
-				        			<input type="checkbox" name="isNew" hidden>
-		        					<div class="form-group">
-			        					<label>Nom:</label>
-			        					<input type="text" name="name" class="form-control">
-			        					<label>Avatar :</label>
-			        					<input type="text" name="avatar" class="form-control" >
-									</div>
-		        					<div class="form-group">
-			        					<label>Coté du chat :</label>
-			        					<div class="form-check form-check-inline">
-										  <input class="form-check-input" type="radio" name="defaultSide" value="left">
-										  <label class="form-check-label" for="inlineRadio1">Gauche</label>
-										</div>
-										<div class="form-check form-check-inline">
-										  <input class="form-check-input" type="radio" name="defaultSide" value="right">
-										  <label class="form-check-label" for="inlineRadio2">Droit</label>
-										</div>
-									</div>
-									<button type="submit" class="btn btn-primary">Enregistrer</button>
-		        				</form>
-		        			</div>
-		        		</div>
-			        </div>
+							</div>
+        					<div class="form-group">
+								<label>Date & Heure :</label>
+				                <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+				                    <input type="text" class="form-control datetimepicker-input" data-target="#datetimepicker1" name="datetime"/>
+				                    <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+				                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+				                    </div>
+				                </div>
+        					</div>
+							<div class="form-group">
+								<label for="formControlRange">Délai : <output id="delayOutput">0 sec</output></label>
+								
+								<input type="range" class="form-control-range" id="delayInput" name="delay" oninput="delayOutput.value = delayInput.value + ' sec'" value="0" min="0" max="60">
+	        					<div class="form-check">
+								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
+								  <label class="form-check-label" for="defaultCheck1">
+								  	Touch pour continuer
+								  </label>
+								</div>
+								<div class="form-check">
+								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" name="adsFlag">
+								  <label class="form-check-label" for="defaultCheck2">
+								    Avertissement placement de produit
+								  </label>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Enregistrer</button>
+		        		</form>
+        			</div>
+        			<div id="characterPanel" class="page characterListContainer" style="display: none;">
+        				<div  class="d-flex">
+        					<input type="text" name="characterFilter" placeholder="Recherche..." style="width: 100%">
+        					<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);"><i class="fas fa-plus"></i></button>
+        				</div>
+        				<ul id="mainCharacterList" class="list-group characterList">
+        					
+        				</ul>
+        			</div>
+        			<div class="page characterFormContainer" style="display: none;">
+        				<div style="right: 2%;position: absolute;"><button class="btn btn-danger" onclick="$('.characterListContainer').show();$('.characterFormContainer').hide();"><i class="fas fa-times"></i></button></div>
+        				<form name="characterForm" onsubmit="editor.characterFormSubmit();return false;">
+		        			<input type="text" name="characterName" hidden>
+		        			<input type="checkbox" name="isNew" hidden>
+        					<div class="form-group">
+	        					<label>Nom:</label>
+	        					<input type="text" name="name" class="form-control">
+	        					<label>Avatar :</label>
+	        					<input type="text" name="avatar" class="form-control" >
+							</div>
+        					<div class="form-group">
+	        					<label>Coté du chat :</label>
+	        					<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="defaultSide" value="left">
+								  <label class="form-check-label" for="inlineRadio1">Gauche</label>
+								</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="defaultSide" value="right">
+								  <label class="form-check-label" for="inlineRadio2">Droit</label>
+								</div>
+							</div>
+							<button type="submit" class="btn btn-primary">Enregistrer</button>
+        				</form>
+        			</div>
+        		</div>
 			        <div id="configPanel" class="page" style="display: none;">
 			        	
 			        </div>

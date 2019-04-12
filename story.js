@@ -37,30 +37,32 @@ class Story {
 	async playStory(id = 0){
 		this.id = id;
 		$(this.chatElement).empty();
-		this.generateMessagesGroup();
-		var messagesGroup = null;
-		var lastCharacter = this.conversation[0].character;
-	    let tapeRequiredFlag = false;
-	    while(this.id < this.conversation.length && !tapeRequiredFlag){
-	      if(this.conversation[this.id].tapeFlag){
-	          tapeRequiredFlag = true;
-	      }else{
-	        await this.waitFor(this.editor ? 0 : this.conversation[this.id].delay);
-	        //this.insertChat(array[this.state.displayStory.length], true)
-	        //chatElement.append(this.conversation[this.id].output());
-	        if(messagesGroup == null || this.conversation[this.id].character !== lastCharacter){
-	        	lastCharacter = this.conversation[this.id].character;
-	        	messagesGroup = this.MessageGroupDom(this.conversation[this.id].side, lastCharacter)
-	        	$(this.chatElement).append(messagesGroup);
-	        }
-	        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
-	        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
-	        var page = $(this).attr('href'); // Page cible
-			var speed = 400; // Durée de l'animation (en ms)
-			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
-	        this.id++;
-	      }
-	    }
+		if(this.conversation.length){
+			this.generateMessagesGroup();
+			var messagesGroup = null;
+			var lastCharacter = this.conversation[0].character;
+		    let tapeRequiredFlag = false;
+		    while(this.id < this.conversation.length && !tapeRequiredFlag){
+		      if(this.conversation[this.id].tapeFlag){
+		          tapeRequiredFlag = true;
+		      }else{
+		        await this.waitFor(this.editor ? 0 : this.conversation[this.id].delay);
+		        //this.insertChat(array[this.state.displayStory.length], true)
+		        //chatElement.append(this.conversation[this.id].output());
+		        if(messagesGroup == null || this.conversation[this.id].character !== lastCharacter){
+		        	lastCharacter = this.conversation[this.id].character;
+		        	messagesGroup = this.MessageGroupDom(this.conversation[this.id].side, lastCharacter)
+		        	$(this.chatElement).append(messagesGroup);
+		        }
+		        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
+		        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
+		        var page = $(this).attr('href'); // Page cible
+				var speed = 400; // Durée de l'animation (en ms)
+				$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
+		        this.id++;
+		      }
+		    }
+		}
 	    //Si la story est fini sinon attend un touch
 	    if(this.id >= this.conversation.length)
 	      console.log('Done!');
@@ -296,6 +298,8 @@ class Editor extends Story{
 		else{
 			this.editCharacterEditor(character, characterName, characterNameOld);
 		}
+		$(".characterFormContainer").hide();
+		$(".characterListContainer").show();
 	}
 
 	insertCharacterEditor(character, characterName){
@@ -349,6 +353,9 @@ class Editor extends Story{
 	}
 
 	LoadSelectedCharacter(characterName, isNew = false){
+		$(".characterListContainer").hide();
+		$(".characterFormContainer").show();
+
 		let charaForm = document.forms["characterForm"];
 		charaForm["characterName"].value = characterName;
 		charaForm["isNew"].value = isNew;
@@ -371,7 +378,6 @@ class Editor extends Story{
 	}
 
 	GetIdByMessageListElement(element){
-		console.log($(element).index('#messageList>li'));
 		return $(element).index('#messageList>li');
 	}
 
@@ -383,7 +389,7 @@ class Editor extends Story{
 		let messageItem = $(`
 			<li class="list-group-item d-flex align-items-center">
 				<img class="avatar" src="${this.characters[message.character].avatar}"/>
-				<div class="flex-grow-1 ${message.text ? "text" : ""}" contenteditable="true" style="padding-left:5%;">${message.text ? message.text : message.payload.type}</div>
+				<div class="flex-grow-1 text" contenteditable="true">${message.text ? message.text : message.payload.type}</div>
 				<div class="btn-group tools">
 					<button class="btn btn-secondary messageEdit"><i class="fas fa-edit"></i></button>
 					<button class="btn btn-secondary messageDelete"><i class="fas fa-times"></i></button>
@@ -401,13 +407,15 @@ class Editor extends Story{
 	}
 
 	MoveSelectedMessage(currentId, move){
-		var target = $(`#messageList>li:nth-child(${(currentId+move)+1})`);
-		if(move > 0){
-			target.after($(this.GetMessageListElementById(currentId)).detach());
-		}else{
-			target.before($(this.GetMessageListElementById(currentId)).detach());
+		if(currentId+move >= 0 && currentId+move < this.conversation.length){
+			var target = $(`#messageList>li:nth-child(${(currentId+move)+1})`);
+			if(move > 0){
+				target.after($(this.GetMessageListElementById(currentId)).detach());
+			}else{
+				target.before($(this.GetMessageListElementById(currentId)).detach());
+			}
+			this.conversation.splice((currentId+move),0 ,this.conversation.splice(currentId,1)[0]);
 		}
-		this.conversation.splice((currentId+move),0 ,this.conversation.splice(currentId,1)[0]);
 	}
 
 	messageFormSubmit(){
@@ -432,12 +440,13 @@ class Editor extends Story{
 			this.editMessageEditor(id, message);
 		}
 
-		$("#messageFormContainer").hide();
-		$("#messageListContainer").show();
+		$(".messageFormContainer").hide();
+		$(".messageListContainer").show();
 	}
 	insertMessageEditor(id, message){
 		//let messageDom = $(message.toDOM(this.editor));
 		this.conversation.splice(id,0 ,message);
+		$("#messageList").append(this.messageItemDom(message, id));
 		/*console.log(this.conversation);
 		if(id > 0 && id < this.conversation.length -1){
 			if(this.conversation[id-1].character !== message.character && this.conversation[id+1].character === this.conversation[id-1].character){
@@ -498,8 +507,8 @@ class Editor extends Story{
 	}
 
 	LoadSelectedMessage(id, isNew = false){
-		$("#messageListContainer").hide();
-		$("#messageFormContainer").show();
+		$(".messageListContainer").hide();
+		$(".messageFormContainer").show();
 
 		let msgForm = document.forms["messageForm"];
 		msgForm["messageId"].value = id;
