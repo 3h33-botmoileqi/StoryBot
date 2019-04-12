@@ -34,8 +34,8 @@ class Story {
 	    });
 	  }
 
-	async playStory(){
-		this.id=0;
+	async playStory(id = 0){
+		this.id = id;
 		$(this.chatElement).empty();
 		this.generateMessagesGroup();
 		var messagesGroup = null;
@@ -54,7 +54,10 @@ class Story {
 	        	$(this.chatElement).append(messagesGroup);
 	        }
 	        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
-	        $("body").scrollTop($("body").prop('scrollHeight'));
+	        //$("#mainContent").scrollTop($("#mainContent").prop('scrollHeight'));
+	        var page = $(this).attr('href'); // Page cible
+			var speed = 750; // Durée de l'animation (en ms)
+			$("#chatPanel").animate( { scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
 	        this.id++;
 	      }
 	    }
@@ -73,7 +76,7 @@ class Story {
 	MessageGroupDom(side, lastCharacter){
 		return $(`
 			<li class="messagesGroup">
-    			<div class="messagesGroup-header header-${this.conversation[this.id].side}">
+    			<div class="messagesGroup-header header-${side}">
     				<div>
     					${this.config.displaycharacterAvatar ? `<img class="avatar" src="${this.characters[lastCharacter].avatar}"/>` : ""}
     					${this.config.displaycharacterName ? `<h6>${lastCharacter}</h6>` : ""}
@@ -88,7 +91,7 @@ class Story {
 	}
 
 	GetMessageElementById(id){
-		return $(`#chat .message`).get(id);
+		return $($(`#chat .message`).get(id));
 	}
 
 	insertMessageElement(message, parent,id=null){
@@ -117,8 +120,9 @@ class Story {
     	this.conversation.splice(id, 1);
 	}
 
-	onMessageInput(message, text){
-		this.conversation[this.GetIdByMessageElement($(message))].text = text;
+	onMessageInput(id, text){
+		this.conversation[id].text = text;
+		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM(this.editor));
 	}
 
 
@@ -170,16 +174,16 @@ class Message{
 	toDOM(withEditorTools){
 		let message = $(`<li class="message message-${this.side}">
 					<div class="message-container">
-						<div class="${this.text ? "text" : this.payload.type}" ${this.text ? 'contenteditable="true"' : ""}>${this.loadContent()}</div>
+						<div class="${this.text ? "text" : this.payload.type}" ${this.text ? 'contenteditable="false"' : ""}>${this.loadContent()}</div>
 						<div class="Date">${this.GetTime()}</div>
 					</div>
-					${withEditorTools ? '<div class="tools-container"><button class="messageEdit"><i class="fas fa-edit"></i></button><button class="messageDelete"><i class="fas fa-times"></i></button></div>' : ""}
 				</li>`);
-		if(withEditorTools){
+		//${withEditorTools ? '<div class="tools-container"><button class="messageEdit"><i class="fas fa-edit"></i></button><button class="messageDelete"><i class="fas fa-times"></i></button></div>' : ""}
+		/*if(withEditorTools){
         	$(message).find('.messageEdit').click(function(){$('.page').hide();$('#messagePanel').show();editor.LoadSelectedMessage(editor.GetIdByMessageElement(message));});
         	$(message).find('.messageDelete').click(function(){editor.DeleteMessageEditor(editor.GetIdByMessageElement(message))});
         	$(message).find('.text').on('input',function(){editor.onMessageInput(message, $(this).text())});
-		}
+		}*/
 		return message;
 	}
 
@@ -244,6 +248,11 @@ class Editor extends Story{
 		this.loadMessages();
 	}
 
+	StartStoryEditor(){
+		$("#chat").empty();
+		this.playStory();
+	}
+
 	loadCharacters(){
 		let list = this.charactersList;
 		$(list).each(function(indexList, list){
@@ -261,9 +270,10 @@ class Editor extends Story{
 
 	characterItemDom(characterName){
 		let characterItem = $(`
-			<li id="character-${characterName}" class="list-group-item d-flex justify-content-between align-items-center">
-				${characterName}
-				<div class="tools">
+			<li id="character-${characterName}" class="list-group-item d-flex align-items-center">
+				<img class="avatar" src="${this.characters[characterName].avatar}"/>
+				<div class="flex-grow-1 text">${characterName}</div>
+				<div class="btn-group tools">
 					<button class="btn btn-secondary characterEdit"><i class="fas fa-user-edit"></i></button>
 					<button class="btn btn-secondary characterDelete"><i class="fas fa-times"></i></button>
 				</div>
@@ -359,19 +369,45 @@ class Editor extends Story{
 			$("#messageList").append(messageItem);
 		});
 	}
+
+	GetIdByMessageListElement(element){
+		console.log($(element).index('#messageList>li'));
+		return $(element).index('#messageList>li');
+	}
+
+	GetMessageListElementById(id){
+		return $($(`#messageList>li`).get(id));
+	}
+
 	messageItemDom(message, index){
 		let messageItem = $(`
-			<li class="list-group-item d-flex justify-content-between align-items-center">
-				${message.text ? message.text : message.payload.type}
-				<div class="tools">
+			<li class="list-group-item d-flex align-items-center">
+				<img class="avatar" src="${this.characters[message.character].avatar}"/>
+				<div class="flex-grow-1 ${message.text ? "text" : ""}" contenteditable="true" style="padding-left:5%;">${message.text ? message.text : message.payload.type}</div>
+				<div class="btn-group tools">
 					<button class="btn btn-secondary messageEdit"><i class="fas fa-edit"></i></button>
 					<button class="btn btn-secondary messageDelete"><i class="fas fa-times"></i></button>
+					<button class="btn btn-secondary messageUp"><i class="fas fa-arrow-up"></i></button>
+					<button class="btn btn-secondary messageDown"><i class="fas fa-arrow-down"></i></button>
 				</div>
 			</li>
 			`);
 	    $(messageItem).find('.messageEdit').click(function(){editor.LoadSelectedMessage(index);});
 	    $(messageItem).find('.messageDelete').click(function(){editor.DeleteMessageEditor(index)});
+	    $(messageItem).find('.messageUp').click(function(){editor.MoveSelectedMessage(editor.GetIdByMessageListElement(messageItem), -1);});
+	    $(messageItem).find('.messageDown').click(function(){editor.MoveSelectedMessage(editor.GetIdByMessageListElement(messageItem), 1)});
+        $(messageItem).find('.text').on('input',function(){editor.onMessageInput(editor.GetIdByMessageListElement(messageItem), $(this).text());});
 	    return messageItem;
+	}
+
+	MoveSelectedMessage(currentId, move){
+		var target = $(`#messageList>li:nth-child(${(currentId+move)+1})`);
+		if(move > 0){
+			target.after($(this.GetMessageListElementById(currentId)).detach());
+		}else{
+			target.before($(this.GetMessageListElementById(currentId)).detach());
+		}
+		this.conversation.splice((currentId+move),0 ,this.conversation.splice(currentId,1)[0]);
 	}
 
 	messageFormSubmit(){
@@ -395,32 +431,46 @@ class Editor extends Story{
 		}else{
 			this.editMessageEditor(id, message);
 		}
+
+		$("#messageFormContainer").hide();
+		$("#messageListContainer").show();
 	}
 	insertMessageEditor(id, message){
-		let messageDom = $(message.toDOM(this.editor));
+		//let messageDom = $(message.toDOM(this.editor));
 		this.conversation.splice(id,0 ,message);
+		/*console.log(this.conversation);
 		if(id > 0 && id < this.conversation.length -1){
-			if(this.conversation[id-1].character == message.character){
-				//Append After
-				this.GetMessageElementById(id-1).after(messageDom);
-			}else if(this.conversation[id+1].character === message.character){
+			if(this.conversation[id-1].character !== message.character && this.conversation[id+1].character === this.conversation[id-1].character){
+				//split message group
+				console.log("split message group");
+			}
+			else if(this.conversation[id-1].character === message.character){
+				console.log("append after");
+				this.GetMessageElementById(id-1).after($(messageDom));
+			}
+			else if(this.conversation[id+1].character === message.character){
 				//Append before
-				this.GetMessageElementById(id+1).before(messageDom);
-			}else{
+				console.log("append before:")
+				console.log(this.conversation[id]);
+				console.log(this.GetMessageElementById(id));
+				this.GetMessageElementById(id).before(messageDom);
+			}
+			else{
 				//New Message Group
-				var messagesGroup = MessageGroupDom(message.side, message.character);
-				this.GetMessageElementById(id-1).closest(".messagesGroup").after(messagesGroup);
-				messagesGroup.children("ul").append(messageDom);
-
+				var messagesGroup = this.MessageGroupDom(message.side, message.character);
+				this.GetMessageElementById(id-1).closest(".messagesGroup").after($(messagesGroup));
+				messagesGroup.children("ul").append($(messageDom));	
 			}
 		}else if(id == 0){
 			if(this.conversation[1].character === message.character){
-				this.GetMessageElementById(1).before(messageDom);
+				this.GetMessageElementById(1).before($(messageDom));
 			}
 			else{
-				var messagesGroup = MessageGroupDom(message.side, message.character);
-				this.GetMessageElementById(1).closest(".messagesGroup").after(messagesGroup);
-				messagesGroup.children("ul").append(messageDom);
+				console.log("trouver")
+				var messagesGroup = this.MessageGroupDom(message.side, message.character);
+				console.log(this.GetMessageElementById(0).closest(".messagesGroup"));
+				this.GetMessageElementById(0).closest(".messagesGroup").before($(messagesGroup));
+				messagesGroup.children("ul").append($(messageDom));
 			}
 		}else{
 			console.log("Append at the end character:"+message.character + "/id:"+ id +"(last message:"+this.conversation[this.conversation.length-2].character+"/id:"+(this.conversation.length-2)+")");
@@ -434,6 +484,7 @@ class Editor extends Story{
 				this.conversation.push(message);
 			}
 		}
+		return messageDom;*/
 	}
 
 	editMessageEditor(id, message){
@@ -447,13 +498,15 @@ class Editor extends Story{
 	}
 
 	LoadSelectedMessage(id, isNew = false){
-		//TODO
-		//Charger le message dans le formulaire de message
+		$("#messageListContainer").hide();
+		$("#messageFormContainer").show();
+
 		let msgForm = document.forms["messageForm"];
 		msgForm["messageId"].value = id;
 		msgForm["isNew"].value = isNew;
 		//INIT FORM
 		msgForm["character"].value = "";
+		msgForm["content"].value = "text";
 		$('#textPayload').show();
 		$('#mediaPayload').hide();
 		msgForm["payload-type"].value = "";
@@ -461,7 +514,7 @@ class Editor extends Story{
 		quill.root.innerHTML = "";
 		$('#datetimepicker1').datetimepicker('date', new Date());
 		msgForm["delay"].value = 0;
-		msgForm["tapeFlag"].value = false;
+		msgForm["tapeFlag"].value = true;
 		msgForm["adsFlag"].value = false;
 		if(!isNew){
 			let msg = this.conversation[id];
@@ -487,7 +540,4 @@ class Editor extends Story{
 			msgForm["adsFlag"].value = msg.ads;
 		}
 	}
-
-	//TODO Delete / Edition fonction & event pour Character & Message
-	//TODO Scroll to messageId
 }

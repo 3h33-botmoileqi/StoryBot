@@ -1,6 +1,12 @@
 :root {
-  --sidebar-width: 25%;
-  --sidebar-width-negative: -25%;
+      --sidebar-width: 25%;
+      --sidebar-width-negative: -25%;
+    }
+@media (max-width: 768px) {
+    :root {
+      --sidebar-width: 33%;
+      --sidebar-width-negative: -33%;
+    }
 }
 
 @import "https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700";
@@ -67,14 +73,15 @@ a:focus {
     background: #7386D5;
     color: #fff;
     transition: all 0.3s;
-}
-
-#sidebar.active {
     margin-left: var(--sidebar-width-negative);
 }
 
+#sidebar.active {
+    margin-left: 0;
+}
+
 #sidebar .sidebar-header {
-    padding: 10px;
+    padding: 5px;
     background: #6d7fcc;
 }
 
@@ -150,7 +157,7 @@ a.article:hover {
     CONTENT STYLE
 ----------------------------------------------------- */
 #content {
-    width: calc(100% - var(--sidebar-width));
+    width: 100%;
     /* padding: 40px; */
     min-height: 100vh;
     transition: all 0.3s;
@@ -161,7 +168,18 @@ a.article:hover {
 }
 
 #content.active {
-    width: 100%;
+    width: calc(100% - var(--sidebar-width));
+}
+
+.page {
+    overflow: auto;
+    height: 92vh;
+    padding: 25px;
+}
+@media (max-width: 768px) {
+    .page {
+        padding: 10px;
+    }
 }
 /* ---------------------------------------------------
     CHAT STYLE
@@ -181,17 +199,40 @@ a.article:hover {
     width: 45px;
     padding: 6px 0;
 }
-#mainContent{
-    height: 100vh;
-    overflow: auto;
-    padding-top: 60px;
+
+.editor-toolbar .buttonPage.active{
+    box-shadow: 0 0 0 0.2rem rgba(23,162,184,.5);
 }
+
+#mainContent{
+    /* height: 100vh; */
+    /* overflow: auto; */
+    /* padding-top: 60px; */
+}
+
+.editorMode {
+    /* height: 60px; */
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%,0);
+    border: black 1px solid;
+    padding: 5px;
+    border-radius: 5%;
+    background: #f3f3f3;
+}
+
+#chatPanel {
+    padding: 10px;
+}
+
 #chat{
     display: flex;
     flex-direction: column;
     list-style-type: none;
+    /* overflow: auto; */
     padding-inline-start: 0px;
-    padding: 0 10px
+    /* height: 92vh; */
+    margin: 0;
 }
 .messagesGroup>ul{
     padding-inline-start: 0px;
@@ -291,40 +332,81 @@ a.article:hover {
 }
 
 .tools-container button{
-    
-background: transparent;
-    
-font-size: 1.2em;
-    
-border: transparent;
-    
-width: 40px;
-    
-margin-top: 5px;
+    background: transparent;
+    font-size: 1.2em;
+    border: transparent;
+    width: 40px;
+    margin-top: 5px;
 }
 /*----------------------------------------
     MessageList
 --------------------------------------------------*/
+.messageListContainer{
+    width: 100%
+}
+
 #messageList {
-    height: 87%;
     overflow: auto;
+    max-height: 85%;
 }
 
 #messageList .tools {
-    padding-left: 5%;
-    min-width: 120px;
+    min-width: 160px;
 }
 
+#messageList .list-group-item{
+    padding: 0.3em;
+}
+
+#messageList .text{
+    padding-left: 5%;
+}
 /*----------------------------------------
     CharacterList
 --------------------------------------------------*/
-.characterList {
-    height: 87%;
-    overflow: auto;
+
+.CharacterListContainer{
+    width: 100%
 }
-.characterList .tools {
+
+#mainCharacterList {
+    overflow: auto;
+    max-height: 80%;
+}
+#mainCharacterList .tools {
+    /*min-width: 160px;*/
+}
+
+#mainCharacterList .list-group-item{
+    padding: 0.3em;
+}
+
+#mainCharacterList .text{
     padding-left: 5%;
-    min-width: 120px;
+}
+/*-----------------------------------------------------
+    ANIMATION
+---------------------------------------------------------*/
+
+.messagesGroup{
+  animation: animateElement ease-out .5s;
+  animation-iteration-count: 1;
+}
+
+.message{
+  animation: animateElement ease-out .5s;
+  animation-iteration-count: 1;
+}
+
+@keyframes animateElement{
+  0% {
+    opacity:0;
+    transform:  translate(0px,10px);
+  }
+  100% {
+    opacity:1;
+    transform:  translate(0px,0px);
+  }
 }
 /* ---------------------------------------------------
     MEDIAQUERIES
