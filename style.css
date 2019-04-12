@@ -388,12 +388,12 @@ a.article:hover {
 ---------------------------------------------------------*/
 
 .messagesGroup{
-  animation: animateElement ease-out .5s;
+  animation: animateElement ease-out .75s;
   animation-iteration-count: 1;
 }
 
 .message{
-  animation: animateElement ease-out .5s;
+  animation: animateElement ease-out .75s;
   animation-iteration-count: 1;
 }
 
