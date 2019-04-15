@@ -15,6 +15,9 @@
 	    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 	    <!-- Tempus Dominus css -->
 	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
+	    <!-- CodeMirror -->
+	   	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/codemirror.css" integrity="sha256-o/v/5fOniPHMAww4EAIfRBFV0SeoqksPrY0Yq5x+wSM=" crossorigin="anonymous" />
+	   	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror-colorpicker@1.9.50/dist/codemirror-colorpicker.css" integrity="sha256-AJQh3P7c9UKLzfjuwPCS9aovafSQjn8iWXt9rpmvW5g=" crossorigin="anonymous">
 	</head>
 	<body data-__gyazo-extension-added-paste-support="true">
 	    <div class="wrapper">
@@ -45,12 +48,12 @@
 		                    	<li class="nav-item"><button type="button" class="btn btn-info" onclick="$('.page').hide();$('#cloudPanel').show()"><i class="fas fa-cloud"></i></button></li>
 	                    	</ul>-->
 	                    	<div class="nav ml-auto btn-group ">
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#chatPanel').show();editor.StartStoryEditor();"><i class="fas fa-eye"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#messagePanel').show();"><i class="fas fa-comments"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#characterPanel').show();"><i class="fas fa-users"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#configPanel').show()"><i class="fas fa-cogs"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#sharePanel').show()"><i class="fas fa-share-alt"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="$('.buttonPage').removeClass('active');$(this).addClass('active');$('.page').hide();$('#cloudPanel').show()"><i class="fas fa-cloud"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#chatPanel');editor.StartStoryEditor();"><i class="fas fa-eye"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#messagePanel');"><i class="fas fa-comments"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#characterPanel');"><i class="fas fa-users"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#configPanel');"><i class="fas fa-cogs"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#sharePanel');"><i class="fas fa-share-alt"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#cloudPanel');"><i class="fas fa-cloud"></i></button>
 	                    	</div>
 	                	</div>
 	                </div>
@@ -60,13 +63,13 @@
 	            		<div class="editorMode">
 	            			Visualisation
 	            			<div class="form-check">
-							  <input class="form-check-input" type="radio" name="editorMode" value="true" onchange="editor.editor=true;editor.StartStoryEditor()" checked>
+							  <input id="viewMode" class="form-check-input" type="radio" name="editorMode" value="true" onchange="editor.changeViewMode('editor');" checked>
 							  <label class="form-check-label">
 							    Editeur
 							  </label>
 							</div>
 							<div class="form-check">
-							  <input class="form-check-input" type="radio" name="editorMode" value="false" onchange="editor.editor=false;editor.StartStoryEditor()" >
+							  <input id="viewMode" class="form-check-input" type="radio" name="editorMode" value="false" onchange="editor.changeViewMode('user');" >
 							  <label class="form-check-label">
 							    Utilisateur
 							  </label>
@@ -84,7 +87,7 @@
         				</ul>
         			</div>
         			<div class="page messageFormContainer" style="display: none;">
-        				<div style="right: 2%;position: absolute;"><button class="btn btn-danger" onclick="$('.messageListContainer').show();$('.messageFormContainer').hide();"><i class="fas fa-times"></i></button></div>
+        				<div class="exitPanel"><button class="btn btn-danger" onclick="$('.messageListContainer').show();$('.messageFormContainer').hide();"><i class="fas fa-times"></i></button></div>
 		        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
 		        			<input type="text" name="messageId" hidden>
 		        			<input type="checkbox" name="isNew" hidden>
@@ -173,7 +176,7 @@
         				</ul>
         			</div>
         			<div class="page characterFormContainer" style="display: none;">
-        				<div style="right: 2%;position: absolute;"><button class="btn btn-danger" onclick="$('.characterListContainer').show();$('.characterFormContainer').hide();"><i class="fas fa-times"></i></button></div>
+        				<div class="exitPanel"><button class="btn btn-danger" onclick="$('.characterListContainer').show();$('.characterFormContainer').hide();"><i class="fas fa-times"></i></button></div>
         				<form name="characterForm" onsubmit="editor.characterFormSubmit();return false;">
 		        			<input type="text" name="characterName" hidden>
 		        			<input type="checkbox" name="isNew" hidden>
@@ -197,10 +200,88 @@
 							<button type="submit" class="btn btn-primary">Enregistrer</button>
         				</form>
         			</div>
-        		</div>
 			        <div id="configPanel" class="page" style="display: none;">
-			        	
+			        	<form name="configForm" onsubmit="editor.configFormSubmit();return false;">
+			        		<div class="form-group">
+			        			<label>Nom de la Story :</label>
+			        			<input type="text" name="storyName">
+				        		<div class="form-check">
+					        		<input class="form-check-input" type="checkbox" name="displayAvatar">
+				        			<label>Afficher les avatars</label>
+					        	</div>
+				        		<div class="form-check">
+					        		<input class="form-check-input" type="checkbox" name="displayName">
+				        			<label>Afficher les nom des personnage</label>
+				        		</div>
+				        		<div class="form-check">
+					        		<input class="form-check-input" type="checkbox" name="displayDate">
+				        			<label class="form-check-label">Afficher les dates des messages</label>
+				        		</div>
+			        		</div>
+        					<div class="form-group">
+	        					<label>Pub chaque X Messages :</label>
+	        					<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="adsEachMessages" value="true" onchange="$('#adsConfig').show();">
+								  <label class="form-check-label" for="inlineRadio1">Oui</label>
+								</div>
+								<div class="form-check form-check-inline">
+								  <input class="form-check-input" type="radio" name="adsEachMessages" value="false" onchange="$('#adsConfig').hide();" checked="true">
+								  <label class="form-check-label" for="inlineRadio2">Non</label>
+								</div>
+								<div id="adsConfig" style="display: none;">
+				        			<label for="formControlRange">Chaque <output id="adsEachMessagesOutput">1</output> messages</label>
+									<input type="range" class="form-control-range" id="adsEachMessagesInput" name="adsEachMessages" oninput="adsEachMessagesOutput.value = adsEachMessagesInput.value" value="1" min="1" max="100">
+								</div>
+							</div>
+							<input class="btn btn-primary" type="submit" name="configSubmit">
+			        	</form>
+			        	<div style="position: absolute;right: 5vw;bottom: 5vh;">
+		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirror.refresh();">CSS Personalisé <i class="fas fa-file-code"></i></button>
+		        		</div>
 			        </div>
+		        	<div id="cssPanel" class="page" style="display:none">
+        				<div class="exitPanel"><button class="btn btn-danger" onclick="editor.changePanel('#configPanel')"><i class="fas fa-times"></i></button></div>
+        				<div class="d-flex">
+        					<ul id='example' style="width: 50vw;height: 85vh;">
+        						<li class="messagesGroup">
+					    			<div class="messagesGroup-header header-left">
+					    				<div>
+					    					<img class="avatar" src="https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png"/>
+					    					<h6>Jean Dupont</h6>
+					    				</div>
+					    			</div>
+					    			<ul>
+					    				<li class="message message-left">
+											<div class="message-container">
+												<div class="text">Ceci est un text d'exemple</div>
+												<div class="Date">12:00</div>
+											</div>
+										</li>
+					    			</ul>
+						        </li>
+						        <li class="messagesGroup">
+					    			<div class="messagesGroup-header header-right">
+					    				<div>
+					    					<img class="avatar" src="https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png"/>
+					    					<h6>Jean Dupont</h6>
+					    				</div>
+					    			</div>
+					    			<ul>
+					    				<li class="message message-right">
+											<div class="message-container">
+												<div class="text">Ceci est un text d'exemple</div>
+												<div class="Date">12:00</div>
+											</div>
+										</li>
+					    			</ul>
+						        </li>
+        					</ul>
+        					<div id="customCSS"><!--editor.loadCSS(this.value)-->
+        						<textarea id="cssEditor"></textarea>
+        					</div>
+        				</div>
+		        	</div>
+        		</div>
 	        	</div>
 	        </div>
 	    </div>
@@ -224,6 +305,11 @@
 	    <!-- Font Awesome JS -->
 	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
 	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+	    <!-- CodeMirror-->
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/codemirror.js" integrity="sha256-gaVop7C3WHsJH7u9FO7YwYLSLGiBGr6wTm2o3huyN24=" crossorigin="anonymous"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/css/css.js" integrity="sha256-X/teJqHXUccfWWBeziAxGjeC7jl07Gaw/FkzK78UMs0=" crossorigin="anonymous"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/addon/edit/closebrackets.js" integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0=" crossorigin="anonymous"></script>
+	    <script src="https://cdn.jsdelivr.net/npm/codemirror-colorpicker@1.9.50/dist/codemirror-colorpicker.min.js" integrity="sha256-xpnjpF/9oKFV6YX0FcvYp7rk+FgsPVMD0JjB1evfpys=" crossorigin="anonymous"></script>
 	    <!-- Custom JS -->
 	    <script type="text/javascript">
 	        $(document).ready(function () {

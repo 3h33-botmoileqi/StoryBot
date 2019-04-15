@@ -1,3 +1,13 @@
+var CodeMirror = CodeMirror.fromTextArea(document.getElementById('cssEditor'), {
+  mode:  "css",
+  lineNumbers: true,
+  autofocus: true,
+  autoCloseBrackets: true,
+  colorpicker : {
+      mode : 'edit'
+  },
+});
+
 var quill = new Quill('#message-editor', {
 	theme: 'snow'
 });
@@ -14,8 +24,14 @@ $(document).ready(function () {//Height adjust
       // We execute the same script as before
       let vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
-    });
+    }); 
 	editor = new Editor($('#chat'), $(".characterList"));
+
+    //link css editor with custom css
+    CodeMirror.on("change", function(cm){
+        editor.loadCSS(cm.getValue());
+    });
+
 	editor.loadEditor();
 	editor.playStory();
 });

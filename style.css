@@ -183,7 +183,11 @@ a.article:hover {
   animation: pageShow ease-out .75s;
   animation-iteration-count: 1;
 }
-
+.exitPanel{
+    right: 2.5%;
+    position: absolute;
+    z-index: 10;
+}
 @keyframes pageShow{
   0% {
     opacity:0;
@@ -240,7 +244,7 @@ a.article:hover {
     padding: 10px;
 }
 
-#chat{
+#chat, #example{
     display: flex;
     flex-direction: column;
     list-style-type: none;
@@ -374,7 +378,8 @@ a.article:hover {
 }
 
 #messageList .text{
-    padding-left: 5vh;
+    padding: 0 2vh;
+    max-width: 68vw;
 }
 /*----------------------------------------
     CharacterList
@@ -398,6 +403,17 @@ a.article:hover {
 
 #mainCharacterList .text{
     padding-left: 5%;
+}
+/*-------------------------------------------------------
+    Config
+----------------------------------------------------------*/
+#customCSS{
+    padding-left: 2vw;
+}
+#customCSS .CodeMirror{
+    width: 45vw;
+    height: 85vh;
+    border: 1px solid #ddd;
 }
 /*-----------------------------------------------------
     ANIMATION

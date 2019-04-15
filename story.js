@@ -6,14 +6,19 @@ class Story {
 			"displaycharacterName":true,
 			"displaycharacterAvatar":true,
 			"displayMessageDate":true,
-			"customCSS":{}
+			"customCSS":""
 		};
 		this.characters = {};
 		this.conversation = [];
 		this.messagesGroup = [];
 		this.chatElement = chatElement;
 		this.id =0;
+		this.resumeId = 0;
 		this.editor = false;
+    	this.cssSheet = document.createElement('style');
+    	this.cssSheet.type = "text/css";
+    	document.body.appendChild(this.cssSheet);
+ 
 		this.loadDemo();
 	}
 
@@ -46,15 +51,16 @@ class Story {
 		      if(this.conversation[this.id].tapeFlag){
 		          tapeRequiredFlag = true;
 		      }else{
-		        await this.waitFor(this.editor ? 0 : this.conversation[this.id].delay);
+		        await this.waitFor(this.editor || this.id < this.resumeId ? 0 : this.conversation[this.id].delay);
 		        //this.insertChat(array[this.state.displayStory.length], true)
 		        //chatElement.append(this.conversation[this.id].output());
+		        //console.log(this.id);
 		        if(messagesGroup == null || this.conversation[this.id].character !== lastCharacter){
 		        	lastCharacter = this.conversation[this.id].character;
 		        	messagesGroup = this.MessageGroupDom(this.conversation[this.id].side, lastCharacter)
 		        	$(this.chatElement).append(messagesGroup);
 		        }
-		        this.insertMessageElement($(this.conversation[this.id].toDOM(this.editor)), $(messagesGroup).children("ul"));
+		        this.insertMessageElement($(this.conversation[this.id].toDOM()), $(messagesGroup).children("ul"));
 		        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
 		        var page = $(this).attr('href'); // Page cible
 				var speed = 400; // Durée de l'animation (en ms)
@@ -105,7 +111,7 @@ class Story {
 	}
 
 	EditMessageElement(message, newMessage){
-		let newMessageElement = $(newMessage.toDOM(this.editor));
+		let newMessageElement = $(newMessage.toDOM());
 		$(message).replaceWith(newMessageElement);
     	this.conversation.splice(this.GetIdByMessageElement(message), 1, newMessage);
 	}
@@ -124,7 +130,7 @@ class Story {
 
 	onMessageInput(id, text){
 		this.conversation[id].text = text;
-		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM(this.editor));
+		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM());
 	}
 
 
@@ -173,7 +179,7 @@ class Message{
 		this.text = text;
 	}
 
-	toDOM(withEditorTools){
+	toDOM(){
 		let message = $(`<li class="message message-${this.side}">
 					<div class="message-container">
 						<div class="${this.text ? "text" : this.payload.type}" ${this.text ? 'contenteditable="false"' : ""}>${this.loadContent()}</div>
@@ -391,6 +397,7 @@ class Editor extends Story{
 				<img class="avatar" src="${this.characters[message.character].avatar}"/>
 				<div class="flex-grow-1 text" contenteditable="true">${message.text ? message.text : message.payload.type}</div>
 				<div class="btn-group tools">
+					<button class="btn btn-secondary messageView"><i class="fas fa-eye"></i></button>
 					<button class="btn btn-secondary messageEdit"><i class="fas fa-edit"></i></button>
 					<button class="btn btn-secondary messageDelete"><i class="fas fa-times"></i></button>
 					<button class="btn btn-secondary messageUp"><i class="fas fa-arrow-up"></i></button>
@@ -398,6 +405,7 @@ class Editor extends Story{
 				</div>
 			</li>
 			`);
+	    $(messageItem).find('.messageView').click(function(){editor.changeViewMode("user",editor.GetIdByMessageListElement(messageItem));editor.changePanel('#chatPanel');});
 	    $(messageItem).find('.messageEdit').click(function(){editor.LoadSelectedMessage(index);});
 	    $(messageItem).find('.messageDelete').click(function(){editor.DeleteMessageEditor(index)});
 	    $(messageItem).find('.messageUp').click(function(){editor.MoveSelectedMessage(editor.GetIdByMessageListElement(messageItem), -1);});
@@ -548,5 +556,33 @@ class Editor extends Story{
 			msgForm["tapeFlag"].value = msg.tapeFlag;
 			msgForm["adsFlag"].value = msg.ads;
 		}
+	}
+
+	changePanel(elementId){
+		$('.buttonPage').removeClass('active');
+		$(this).addClass('active');
+		$('.page').hide();
+		$(elementId).show();
+	}
+
+	changeViewMode(mode, resumeId = -1){//False = user / true = editor
+		this.resumeId = resumeId;
+		//this.editor = mode;
+		if(mode === "editor"){
+			$("#viewMode[value=true]").prop("checked", true);
+			this.editor=true;
+		}else if(mode === "user"){
+			$("#viewMode[value=false]").prop("checked", true);
+			this.editor=false;
+		}
+		else{
+			console.error("mode unknow");
+		}
+		this.StartStoryEditor();
+	}
+
+	loadCSS(css){
+		this.config["customCSS"] = css;
+		this.cssSheet.innerHTML = this.config["customCSS"];
 	}
 }
