@@ -159,7 +159,58 @@ class Story {
 			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false))
 		}
 		this.generateMessagesGroup();
+		var css = 
+		`/*.messagesGroup, .message{
+	-webkit-animation: swirl-in-fwd 0.6s ease-out both;
+	animation: swirl-in-fwd 0.6s ease-out both;
+}
+
+@-webkit-keyframes swirl-in-fwd {
+  0% {
+    -webkit-transform: rotate(-540deg) scale(0);
+            transform: rotate(-540deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: rotate(0) scale(1);
+            transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+@keyframes swirl-in-fwd {
+  0% {
+    -webkit-transform: rotate(-540deg) scale(0);
+            transform: rotate(-540deg) scale(0);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: rotate(0) scale(1);
+            transform: rotate(0) scale(1);
+    opacity: 1;
+  }
+}
+.message .message-container{
+  box-shadow:0px 5px 5px rgba(0, 0, 0, 0.3);
+}
+.message-left .message-container{
+  background:#bdb4fe;
+  color:#000000
+}
+.message-right .message-container{
+  background:#fdaaac;
+  color:#000000
+}
+#chat{
+  background:white
+}*/`;
+		this.loadCSS(css);
 		this.log();
+	}
+
+	loadCSS(css){
+		this.config["customCSS"] = css;
+		this.cssSheet.innerHTML = this.config["customCSS"];
+		console.log(this.cssSheet.innerHTML);
 	}
 }
 
@@ -579,10 +630,5 @@ class Editor extends Story{
 			console.error("mode unknow");
 		}
 		this.StartStoryEditor();
-	}
-
-	loadCSS(css){
-		this.config["customCSS"] = css;
-		this.cssSheet.innerHTML = this.config["customCSS"];
 	}
 }

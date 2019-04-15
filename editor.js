@@ -28,6 +28,7 @@ $(document).ready(function () {//Height adjust
 	editor = new Editor($('#chat'), $(".characterList"));
 
     //link css editor with custom css
+    CodeMirror.setValue(editor.config['customCSS']);
     CodeMirror.on("change", function(cm){
         editor.loadCSS(cm.getValue());
     });
