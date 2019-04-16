@@ -70,8 +70,10 @@ class Story {
 		    }
 		}
 	    //Si la story est fini sinon attend un touch
+	    /*
 	    if(this.id >= this.conversation.length)
 	      console.log('Done!');
+	    */
 	}
 	/******************* Character Management ***********************/
 
@@ -243,9 +245,9 @@ class Message{
 		var date = new Date(this.timestamp*1000);
 	    var hours = date.getHours();
 	    var minutes = date.getMinutes();
-	    var ampm = hours >= 12 ? 'PM' : 'AM';
+	    /*var ampm = hours >= 12 ? 'PM' : 'AM';
 	    hours = hours % 12;
-	    hours = hours ? hours : 12; // the hour '0' should be '12'
+	    hours = hours ? hours : 12; // the hour '0' should be '12'*/
 	    minutes = minutes < 10 ? '0'+minutes : minutes;
 	    var strTime = hours + ':' + minutes;// + ' ' + ampm;
 	    return strTime;
@@ -483,18 +485,17 @@ class Editor extends Story{
 		let msgForm = document.forms["messageForm"];
 		let isNew = msgForm["isNew"].value;
 		let id = msgForm["messageId"].value;
-		console.log(msgForm["character"].value);
+		console.log(new Date($('#datetimepicker1').datetimepicker('viewDate')).getTime() /1000);
 		let message = new Message(
 			msgForm["character"].value,
 			msgForm["side"].value,
 			$(quill.root.innerHTML).html(),
 			{type:msgForm["payload-type"].value, url:msgForm["payload-url"].value},
-			new Date(msgForm["datetime"].value).getTime() /1000,
+			new Date($('#datetimepicker1').datetimepicker('viewDate')).getTime() /1000,
 			msgForm["delay"].value * 1000,
 			msgForm["tapeFlag"].value,
 			msgForm["adsFlag"].value
-			);
-		console.log(isNew);
+			);	
 		if(isNew === "true"){
 			this.insertMessageEditor(id, message);	
 		}else{
@@ -536,7 +537,7 @@ class Editor extends Story{
 		quill.root.innerHTML = "";
 		$('#datetimepicker1').datetimepicker('date', new Date());
 		msgForm["delay"].value = 0;
-		msgForm["tapeFlag"].checked = true;
+		msgForm["tapeFlag"].checked = false;
 		msgForm["adsFlag"].checked = false;
 		if(!isNew){
 			let msg = this.conversation[id];

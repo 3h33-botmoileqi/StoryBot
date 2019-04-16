@@ -32,30 +32,43 @@ $(document).ready(function () {//Height adjust
     CodeMirror.on("change", function(cm){
         editor.loadCSS(cm.getValue());
     });
-
-	editor.loadEditor();
 	editor.playStory();
 });
 /****************** Date Management ***************************/
+function validateEmail(email) {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
+}
 let login = null;
 function loginFormSubmit(){
-    login = document.forms["loginForm"]["login"].value;
-    if(!db.collection('users').doc(login)){
-        db.collection("users").doc(login).set({
-            stories:[]
-        });
+    login = document.forms["loginForm"]["login"].value.toLowerCase();
+    if(validateEmail(login)){
+        db.collection('users').doc(login).get().then(doc => {
+            if (!doc.exists) {
+                console.log('New User');
+                db.collection("users").doc(login).set({});
+            }
+            editor.changePanel("#cloudPanel");
+            loadStories(login);
+        })
+        .catch(err => {
+            console.log('Error getting document', err);
+        })
+    }else{
+        alert("email invalide");
     }
-    editor.changePanel("#cloudPanel");
-    loadStories(login);
 }
 function loadStories(login){
+    $("#storiesList").empty();
     var docRef = db.collection("users").doc(login);
     db.collection("stories").where('author', '==', docRef).get().then(snapshot => {
         if (snapshot.empty) {
-          console.log('No matching documents.');
+          $("#storiesList").append(`
+            <li class="list-group-item d-flex align-items-center">
+                    <div class="flex-grow-1 text">Aucune Story retrouvée</div>
+            </li>`);
           return;
         }
-        $("#storiesList").empty();
         snapshot.forEach(doc => {   
             var storyItem = $(`
                 <li class="list-group-item d-flex align-items-center">
@@ -75,7 +88,6 @@ function loadStories(login){
 function loadStory(storyRef){
     var answer = confirm("Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?")
     if(answer){
-        console.log("yes");
         saveStory(login);
     }
     if(storyRef !== null){
@@ -98,7 +110,6 @@ function loadStory(storyRef){
 
 function saveStory(login){
     var docRef = db.collection("users").doc(login);
-    console.log(editor.storyRef);
     if(editor.storyRef !== null){
         db.collection("stories").doc(editor.storyRef).update({
             author: docRef,
