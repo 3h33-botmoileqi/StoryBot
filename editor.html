@@ -232,7 +232,7 @@
 							<input class="btn btn-primary" type="submit" name="configSubmit">
 			        	</form>
 			        	<div style="position: absolute;right: 5vw;bottom: 5vh;">
-		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirror.refresh();">CSS Personalisé <i class="fas fa-file-code"></i></button>
+		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirror.refresh();CodeMirror.setValue(editor.config.customCSS);">CSS Personalisé <i class="fas fa-file-code"></i></button>
 		        		</div>
 			        </div>
 		        	<div id="cssPanel" class="page" style="display:none">

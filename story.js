@@ -210,6 +210,7 @@ class Story {
 	}
 
 	loadCSS(css){
+		console.log("load css");
 		this.config["customCSS"] = css;
 		this.cssSheet.innerHTML = this.config["customCSS"];
 	}
