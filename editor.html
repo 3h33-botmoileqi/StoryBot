@@ -46,9 +46,10 @@
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#chatPanel');editor.StartStoryEditor();"><i class="fas fa-eye"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#messagePanel');"><i class="fas fa-comments"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#characterPanel');"><i class="fas fa-users"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#configPanel');"><i class="fas fa-cogs"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#configPanel');editor.loadConfig();"><i class="fas fa-cogs"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="login == null ? editor.changePanel('#loginPanel') : saveStory(login)"><i class="fas fa-save"></i></button>
+		                    	<button type="button" class="btn btn-info buttonPage" onclick="login == null ? editor.changePanel('#loginPanel') : $(function(){editor.changePanel('#cloudPanel');loadStories(login);})"><i class="fas fa-cloud-upload-alt"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#sharePanel');"><i class="fas fa-share-alt"></i></button>
-		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#cloudPanel');"><i class="fas fa-cloud"></i></button>
 	                    	</div>
 	                	</div>
 	                </div>
@@ -201,26 +202,26 @@
 			        			<label>Nom de la Story :</label>
 			        			<input type="text" name="storyName">
 				        		<div class="form-check">
-					        		<input class="form-check-input" type="checkbox" name="displayAvatar">
-				        			<label>Afficher les avatars</label>
+					        		<input class="form-check-input" type="checkbox" name="displaycharacterAvatar">
+				        			<label>Afficher les avatars des personnage</label>
 					        	</div>
 				        		<div class="form-check">
-					        		<input class="form-check-input" type="checkbox" name="displayName">
+					        		<input class="form-check-input" type="checkbox" name="displaycharacterName">
 				        			<label>Afficher les nom des personnage</label>
 				        		</div>
 				        		<div class="form-check">
-					        		<input class="form-check-input" type="checkbox" name="displayDate">
+					        		<input class="form-check-input" type="checkbox" name="displayMessageDate">
 				        			<label class="form-check-label">Afficher les dates des messages</label>
 				        		</div>
 			        		</div>
         					<div class="form-group">
 	        					<label>Pub chaque X Messages :</label>
 	        					<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="adsEachMessages" value="true" onchange="$('#adsConfig').show();">
+								  <input class="form-check-input" type="radio" name="adsFlag" value="true" onchange="$('#adsConfig').show();">
 								  <label class="form-check-label" for="inlineRadio1">Oui</label>
 								</div>
 								<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="adsEachMessages" value="false" onchange="$('#adsConfig').hide();" checked="true">
+								  <input class="form-check-input" type="radio" name="adsFlag" value="false" onchange="$('#adsConfig').hide();" checked="true">
 								  <label class="form-check-label" for="inlineRadio2">Non</label>
 								</div>
 								<div id="adsConfig" style="display: none;">
@@ -270,12 +271,32 @@
 										</li>
 					    			</ul>
 						        </li>
-						        <button class="btn btn-primary" style="position:absolute;bottom: 5vh;" onclick="$('#example .messagesGroup').hide();$('#example>.messagesGroup').show();"><i class="fas fa-sync"></i></button>
+						        <button class="btn btn-primary" style="position:absolute;bottom: 5vh;" onclick="$('#example .messagesGroup').hide();setTimeout(function(){$('#example .messagesGroup').show();},500)"><i class="fas fa-sync"></i></button>
         					</ul>
         					<div id="customCSS"><!--editor.loadCSS(this.value)-->
         						<textarea id="cssEditor"></textarea>
         					</div>
         				</div>
+		        	</div>
+		        	<div id="loginPanel" class="page" style="display:none">
+		        		<form name="loginForm" onsubmit="loginFormSubmit(); return false" style="position: absolute;left: 50%;top: 50%;transform: translate(-50%, -50%);">
+		        			<div class="form-group">
+		        				<label>Email</label>
+							    <input type="text" name="login" id="login"  class="form-control"/>
+							    <!--<input type="password" name="pass" id="pass" />-->
+							</div>
+							<input class="btn btn-primary" type="submit"/>
+						</form>
+		        	</div>
+		        	<div id="cloudPanel" class="page" style="display:none">
+		        		<div  class="d-flex">
+        					<input type="text" name="storyFilter" placeholder="Recherche..." style="width: 100%">
+        					<button class="btn-dark" onclick="loadStory(null)"><i class="fas fa-plus"></i></button>
+        				</div>
+						<ul id="storiesList" class="list-group"></ul>
+		        	</div>
+		        	<div id="sharePanel" class="page" style="display:none">
+		        		<h1><i class="fas fa-wrench"></i> En construction <i class="fas fa-wrench"></i></h1>
 		        	</div>
         		</div>
 	        	</div>
@@ -306,6 +327,21 @@
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/css/css.js" integrity="sha256-X/teJqHXUccfWWBeziAxGjeC7jl07Gaw/FkzK78UMs0=" crossorigin="anonymous"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/addon/edit/closebrackets.js" integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0=" crossorigin="anonymous"></script>
 	    <script src="https://cdn.jsdelivr.net/npm/codemirror-colorpicker@1.9.50/dist/codemirror-colorpicker.min.js" integrity="sha256-xpnjpF/9oKFV6YX0FcvYp7rk+FgsPVMD0JjB1evfpys=" crossorigin="anonymous"></script>
+	    <!-- Firebase -->
+  		<script src="https://www.gstatic.com/firebasejs/5.9.4/firebase.js"></script>
+		<script>
+		  // Initialize Firebase
+		  var config = {
+		    apiKey: "AIzaSyA3xCApnLi	P26OGADaVD6M93ue0cHzaN3I",
+		    authDomain: "storybot-68a04.firebaseapp.com",
+		    databaseURL: "https://storybot-68a04.firebaseio.com",
+		    projectId: "storybot-68a04",
+		    storageBucket: "storybot-68a04.appspot.com",
+		    messagingSenderId: "5815195510"
+		  };
+		  firebase.initializeApp(config);
+		  var db = firebase.firestore();
+		</script>
 	    <!-- Custom JS -->
 	    <script type="text/javascript">
 	        $(document).ready(function () {

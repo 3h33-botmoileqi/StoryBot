@@ -1,8 +1,8 @@
 class Story {
 	constructor(chatElement){
+		this.name = "New Story"
 		this.config = {
-			"storyName":"New Story",
-			"adsEachMessage": -1,
+			"adsEachMessages": -1,
 			"displaycharacterName":true,
 			"displaycharacterAvatar":true,
 			"displayMessageDate":true,
@@ -11,7 +11,7 @@ class Story {
 		this.characters = {};
 		this.conversation = [];
 		this.messagesGroup = [];
-		this.chatElement = chatElement;
+		this.chatElement = $('#chat');
 		this.id =0;
 		this.resumeId = 0;
 		this.editor = false;
@@ -19,7 +19,7 @@ class Story {
     	this.cssSheet.type = "text/css";
     	document.body.appendChild(this.cssSheet);
  
-		this.loadDemo();
+		//this.loadDemo();
 	}
 
 	contructor(story, chatElement){
@@ -60,7 +60,7 @@ class Story {
 		        	messagesGroup = this.MessageGroupDom(this.conversation[this.id].side, lastCharacter)
 		        	$(this.chatElement).append(messagesGroup);
 		        }
-		        this.insertMessageElement($(this.conversation[this.id].toDOM()), $(messagesGroup).children("ul"));
+		        this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(messagesGroup).children("ul"));
 		        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
 		        var page = $(this).attr('href'); // Page cible
 				var speed = 400; // Durée de l'animation (en ms)
@@ -110,11 +110,11 @@ class Story {
 		}
 	}
 
-	EditMessageElement(message, newMessage){
+	/*EditMessageElement(message, newMessage){
 		let newMessageElement = $(newMessage.toDOM());
 		$(message).replaceWith(newMessageElement);
     	this.conversation.splice(this.GetIdByMessageElement(message), 1, newMessage);
-	}
+	}*/
 
 	DeleteMessageElement(id){
 		let message = this.GetMessageElementById(id);
@@ -130,7 +130,7 @@ class Story {
 
 	onMessageInput(id, text){
 		this.conversation[id].text = text;
-		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM());
+		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM(this.config.displayMessageDate));
 	}
 
 
@@ -160,7 +160,7 @@ class Story {
 		}
 		this.generateMessagesGroup();
 		var css = 
-		`/*.messagesGroup, .message{
+		`/*.message-container{
 	-webkit-animation: swirl-in-fwd 0.6s ease-out both;
 	animation: swirl-in-fwd 0.6s ease-out both;
 }
@@ -210,7 +210,6 @@ class Story {
 	loadCSS(css){
 		this.config["customCSS"] = css;
 		this.cssSheet.innerHTML = this.config["customCSS"];
-		console.log(this.cssSheet.innerHTML);
 	}
 }
 
@@ -230,19 +229,13 @@ class Message{
 		this.text = text;
 	}
 
-	toDOM(){
+	toDOM(displayMessageDate = true){
 		let message = $(`<li class="message message-${this.side}">
 					<div class="message-container">
 						<div class="${this.text ? "text" : this.payload.type}" ${this.text ? 'contenteditable="false"' : ""}>${this.loadContent()}</div>
-						<div class="Date">${this.GetTime()}</div>
+						${displayMessageDate ? `<div class="Date">${this.GetTime()}</div>` : ""}
 					</div>
 				</li>`);
-		//${withEditorTools ? '<div class="tools-container"><button class="messageEdit"><i class="fas fa-edit"></i></button><button class="messageDelete"><i class="fas fa-times"></i></button></div>' : ""}
-		/*if(withEditorTools){
-        	$(message).find('.messageEdit').click(function(){$('.page').hide();$('#messagePanel').show();editor.LoadSelectedMessage(editor.GetIdByMessageElement(message));});
-        	$(message).find('.messageDelete').click(function(){editor.DeleteMessageEditor(editor.GetIdByMessageElement(message))});
-        	$(message).find('.text').on('input',function(){editor.onMessageInput(message, $(this).text())});
-		}*/
 		return message;
 	}
 
@@ -296,10 +289,22 @@ class Message{
 }*/
 
 class Editor extends Story{
-	constructor(chatElement, charactersList){
-		super(chatElement);
+	constructor(){
+		super();
 		this.editor = true;
-		this.charactersList = $(charactersList);
+		this.storyRef = null;
+		this.loadEditor();
+	}
+
+	loadStory(ref, story){
+		this.storyRef = ref;
+		this.name = story.name;
+		this.config = story.config;
+		this.characters = story.characters;
+		for(let message of story.conversation){
+			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false));
+		}
+		this.loadEditor();
 	}
 
 	loadEditor(){
@@ -313,12 +318,12 @@ class Editor extends Story{
 	}
 
 	loadCharacters(){
-		let list = this.charactersList;
-		$(list).each(function(indexList, list){
-			$(list).html("");
-			$.each(editor.characters,function(characterName, character){
+		var editorRef = this;
+		 $(".characterList").each(function(indexList, list){
+			$(list).empty();
+			$.each(editorRef.characters,function(characterName, character){
 				if($(list).is("#mainCharacterList")){
-					let characterItem = editor.characterItemDom(characterName);
+					let characterItem = editorRef.characterItemDom(characterName);
 					$(list).append(characterItem);
 				}else{
 					$(list).append(`<option value="${characterName}">${characterName}</option>`);
@@ -328,16 +333,15 @@ class Editor extends Story{
 	}
 
 	characterItemDom(characterName){
-		let characterItem = $(`
-			<li id="character-${characterName}" class="list-group-item d-flex align-items-center">
+		let characterItem = $(
+			`<li id="character-${characterName}" class="list-group-item d-flex align-items-center">
 				<img class="avatar" src="${this.characters[characterName].avatar}"/>
 				<div class="flex-grow-1 text">${characterName}</div>
 				<div class="btn-group tools">
 					<button class="btn btn-secondary characterEdit"><i class="fas fa-user-edit"></i></button>
 					<button class="btn btn-secondary characterDelete"><i class="fas fa-times"></i></button>
 				</div>
-			</li>
-			`);
+			</li>`);
 	    $(characterItem).find('.characterEdit').click(function(){editor.LoadSelectedCharacter(characterName);});
 	    $(characterItem).find('.characterDelete').click(function(){editor.DeleteCharacterEditor(characterName)});
 	    return characterItem;
@@ -369,8 +373,7 @@ class Editor extends Story{
 			this.DeleteCharacter(characterNameOld);
 		}
 		this.characters[characterName] = character;
-		let list = this.charactersList;
-		$(list).each(function(indexList, list){
+		 $(".characterList").each(function(indexList, list){
 			if($(list).is("#mainCharacterList")){
 				//Delete LI
 				$(list).find(`li#character-${characterNameOld}`).replaceWith(editor.characterItemDom(characterName));
@@ -396,8 +399,7 @@ class Editor extends Story{
 			}
 		}
 		this.DeleteCharacter(characterName);
-		let list = this.charactersList;
-		$(list).each(function(indexList, list){
+		 $(".characterList").each(function(indexList, list){
 			if($(list).is("#mainCharacterList")){
 				//Delete LI
 				$(list).find(`li#character-${characterName}`).remove();
@@ -428,6 +430,7 @@ class Editor extends Story{
 	}
 
 	loadMessages(){
+		$("#messageList").empty();
 		this.conversation.forEach(function(message, index){
 			let messageItem = editor.messageItemDom(message, index);
 			$("#messageList").append(messageItem);
@@ -443,8 +446,8 @@ class Editor extends Story{
 	}
 
 	messageItemDom(message, index){
-		let messageItem = $(`
-			<li class="list-group-item d-flex align-items-center">
+		let messageItem = $(
+			`<li class="list-group-item d-flex align-items-center">
 				<img class="avatar" src="${this.characters[message.character].avatar}"/>
 				<div class="flex-grow-1 text" contenteditable="true">${message.text ? message.text : message.payload.type}</div>
 				<div class="btn-group tools">
@@ -454,8 +457,7 @@ class Editor extends Story{
 					<button class="btn btn-secondary messageUp"><i class="fas fa-arrow-up"></i></button>
 					<button class="btn btn-secondary messageDown"><i class="fas fa-arrow-down"></i></button>
 				</div>
-			</li>
-			`);
+			</li>`);
 	    $(messageItem).find('.messageView').click(function(){editor.changeViewMode("user",editor.GetIdByMessageListElement(messageItem));editor.changePanel('#chatPanel');});
 	    $(messageItem).find('.messageEdit').click(function(){editor.LoadSelectedMessage(index);});
 	    $(messageItem).find('.messageDelete').click(function(){editor.DeleteMessageEditor(index)});
@@ -503,61 +505,13 @@ class Editor extends Story{
 		$(".messageListContainer").show();
 	}
 	insertMessageEditor(id, message){
-		//let messageDom = $(message.toDOM(this.editor));
 		this.conversation.splice(id,0 ,message);
 		$("#messageList").append(this.messageItemDom(message, id));
-		/*console.log(this.conversation);
-		if(id > 0 && id < this.conversation.length -1){
-			if(this.conversation[id-1].character !== message.character && this.conversation[id+1].character === this.conversation[id-1].character){
-				//split message group
-				console.log("split message group");
-			}
-			else if(this.conversation[id-1].character === message.character){
-				console.log("append after");
-				this.GetMessageElementById(id-1).after($(messageDom));
-			}
-			else if(this.conversation[id+1].character === message.character){
-				//Append before
-				console.log("append before:")
-				console.log(this.conversation[id]);
-				console.log(this.GetMessageElementById(id));
-				this.GetMessageElementById(id).before(messageDom);
-			}
-			else{
-				//New Message Group
-				var messagesGroup = this.MessageGroupDom(message.side, message.character);
-				this.GetMessageElementById(id-1).closest(".messagesGroup").after($(messagesGroup));
-				messagesGroup.children("ul").append($(messageDom));	
-			}
-		}else if(id == 0){
-			if(this.conversation[1].character === message.character){
-				this.GetMessageElementById(1).before($(messageDom));
-			}
-			else{
-				console.log("trouver")
-				var messagesGroup = this.MessageGroupDom(message.side, message.character);
-				console.log(this.GetMessageElementById(0).closest(".messagesGroup"));
-				this.GetMessageElementById(0).closest(".messagesGroup").before($(messagesGroup));
-				messagesGroup.children("ul").append($(messageDom));
-			}
-		}else{
-			console.log("Append at the end character:"+message.character + "/id:"+ id +"(last message:"+this.conversation[this.conversation.length-2].character+"/id:"+(this.conversation.length-2)+")");
-			if(this.conversation[this.conversation.length-2].character === message.character){
-				this.GetMessageElementById(this.conversation.length-2).after(messageDom);
-			}
-			else{
-				var messagesGroup = this.MessageGroupDom(message.side, message.character);
-				$(this.chatElement).append(messagesGroup);
-				messagesGroup.children("ul").append(messageDom);
-				this.conversation.push(message);
-			}
-		}
-		return messageDom;*/
 	}
 
 	editMessageEditor(id, message){
-		this.EditMessageElement($(`#chat .message`).get(id),message)
-		$(`#messageList>li:nth-child(${id+1})`).replaceWith(this.messageItemDom(message, id));
+		this.conversation.splice(id, 1, message);
+		this.GetMessageListElementById(id).replaceWith(this.messageItemDom(message, id));
 	}
 
 	DeleteMessageEditor(id){
@@ -582,8 +536,8 @@ class Editor extends Story{
 		quill.root.innerHTML = "";
 		$('#datetimepicker1').datetimepicker('date', new Date());
 		msgForm["delay"].value = 0;
-		msgForm["tapeFlag"].value = true;
-		msgForm["adsFlag"].value = false;
+		msgForm["tapeFlag"].checked = true;
+		msgForm["adsFlag"].checked = false;
 		if(!isNew){
 			let msg = this.conversation[id];
 			msgForm["character"].value = msg.character;
@@ -604,8 +558,36 @@ class Editor extends Story{
 			$('#datetimepicker1').datetimepicker('date',moment(msg.timestamp*1000));
 			msgForm["delay"].value = msg.delay/1000;
 			$("#delayOutput").text(msgForm["delay"].value+" sec");
-			msgForm["tapeFlag"].value = msg.tapeFlag;
-			msgForm["adsFlag"].value = msg.ads;
+			msgForm["tapeFlag"].checked = msg.tapeFlag;
+			msgForm["adsFlag"].checked = msg.ads;
+		}
+	}
+
+	configFormSubmit(){
+		let configForm = document.forms["configForm"];
+		this.name = configForm['storyName'].value;
+		this.config.displaycharacterName = configForm['displaycharacterName'].checked
+		this.config.displaycharacterAvatar = configForm['displaycharacterAvatar'].checked
+		this.config.displayMessageDate = configForm['displayMessageDate'].checked
+		if(configForm['adsFlag'].value == true)
+			this.config.adsEachMessage = configForm['adsEachMessages'].value
+		else
+			this.config.adsEachMessage = 0;
+	}
+
+	loadConfig(){
+		let configForm = document.forms["configForm"];
+		configForm['storyName'].value = this.name;
+		configForm['displaycharacterName'].checked = this.config.displaycharacterName;
+		configForm['displaycharacterAvatar'].checked = this.config.displaycharacterAvatar;
+		configForm['displayMessageDate'].checked = this.config.displayMessageDate;
+		if(this.config.adsEachMessage>0){
+			$('#adsConfig').show();
+			configForm['adsFlag'].checked = true;
+			configForm['adsEachMessages'].value = this.config.adsEachMessage;
+		}
+		else{
+			$('#adsConfig').hide();
 		}
 	}
 

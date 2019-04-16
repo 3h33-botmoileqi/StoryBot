@@ -378,7 +378,8 @@ a.article:hover {
 }
 
 #messageList .text{
-    padding: 0 2vh;
+    margin: 0 2vh;
+    /* height: 100%; */
     max-width: 68vw;
 }
 /*----------------------------------------
