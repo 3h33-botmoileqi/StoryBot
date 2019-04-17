@@ -25,7 +25,20 @@ $(document).ready(function () {//Height adjust
       let vh = window.innerHeight * 0.01;
       document.documentElement.style.setProperty('--vh', `${vh}px`);
     }); 
-	editor = new Editor();
+
+    editor = new Editor();
+
+    if(localStorage["lastLogin"]){
+            login = localStorage["lastLogin"];
+            loginAccepted(login);
+            if(localStorage["lastStory"]){
+                loadStory(localStorage["lastStory"], false);
+            }else{
+                editor.changePanel("#cloudPanel");
+            }
+    }
+    else
+        editor.changePanel("#loginPanel");
 
     //link css editor with custom css
     CodeMirror.setValue(editor.config['customCSS']);
@@ -48,8 +61,9 @@ function loginFormSubmit(){
                 console.log('New User');
                 db.collection("users").doc(login).set({});
             }
-            editor.changePanel("#cloudPanel");
-            loadStories(login);
+            if(document.forms["loginForm"]["remember"].checked)
+                localStorage["lastLogin"] = login;
+            loginAccepted(login)
         })
         .catch(err => {
             console.log('Error getting document', err);
@@ -58,10 +72,17 @@ function loginFormSubmit(){
         alert("email invalide");
     }
 }
+
+function loginAccepted(login){
+    editor.changePanel("#cloudPanel");
+    editor.AddAuthor(login);
+    $("#authorsForm").show();
+    loadStories(login);
+}
 function loadStories(login){
     $("#storiesList").empty();
     var docRef = db.collection("users").doc(login);
-    db.collection("stories").where('author', '==', docRef).get().then(snapshot => {
+    db.collection("stories").where('authors', 'array-contains', docRef).get().then(snapshot => {
         if (snapshot.empty) {
           $("#storiesList").append(`
             <li class="list-group-item d-flex align-items-center">
@@ -71,10 +92,11 @@ function loadStories(login){
         }
         snapshot.forEach(doc => {   
             var storyItem = $(`
-                <li class="list-group-item d-flex align-items-center">
+                <li class="list-group-item d-flex align-items-center story ${doc.id == editor.storyRef ? "active" : ""}">
                     <div class="flex-grow-1 text">${doc.data().name}</div>
                     <div class="btn-group">
-                        <button class="btn btn-secondary storyLoad" onclick="loadStory('${doc.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-secondary storyLoad" onclick="loadStory('${doc.id}');$('.story').removeClass('active');$(this).closest('.story').addClass('active');"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-secondary storyLoad" onclick="deleteStory('${doc.id}');$(this).closest('.story').remove();"><i class="fas fa-times"></i></button>
                     </div>
                 </li>`);
             $("#storiesList").append(storyItem);
@@ -85,15 +107,18 @@ function loadStories(login){
   });
 }
 
-function loadStory(storyRef){
-    var answer = confirm("Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?")
-    if(answer){
-        saveStory(login);
+function loadStory(storyRef, needConfirm = true){
+    if(needConfirm){
+        var answer = confirm("Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?")
+        if(answer){
+            saveStory(login);
+        }
     }
     if(storyRef !== null){
         db.collection('stories').doc(storyRef).get().then((doc) => {
             editor.loadStory(storyRef, doc.data());
-            alert("Story chargée avec succès");
+            if(needConfirm)
+                alert("Story chargée avec succès");
             editor.changePanel("#chatPanel");
             editor.StartStoryEditor();
         })
@@ -108,11 +133,22 @@ function loadStory(storyRef){
     }
 }
 
+function deleteStory(storyRef){
+    db.collection("stories").doc(storyRef).get().then(doc => {
+        var answer = prompt(`Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en inséré "supprimer" ci-dessous.`)
+        if(answer.toLowerCase() == "supprimer"){
+            doc.ref.delete();
+        }
+    })
+    .catch(err => {
+        console.log('Error getting documents', err);
+    })
+}
+
 function saveStory(login){
     var docRef = db.collection("users").doc(login);
     if(editor.storyRef !== null){
         db.collection("stories").doc(editor.storyRef).update({
-            author: docRef,
             name: editor.name,
             config: editor.config,
             characters: editor.characters,
@@ -121,7 +157,7 @@ function saveStory(login){
   }
   else{
     editor.storyRef = db.collection("stories").add({
-        author: docRef,
+        authors: editor.authors,
         name: editor.name,
         config: editor.config,
         characters: editor.characters,
@@ -129,6 +165,7 @@ function saveStory(login){
     });
     loadStories(login);
   }
+  localStorage["lastStory"] = editor.storyRef;
 }
 
 /**************************************************************/

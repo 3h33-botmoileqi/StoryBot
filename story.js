@@ -296,11 +296,20 @@ class Editor extends Story{
 		super();
 		this.editor = true;
 		this.storyRef = null;
+		this.authors = [];
 		this.loadEditor();
 	}
 
+	//Start Story
+	StartStoryEditor(){
+		$("#chat").empty();
+		this.playStory();
+	}
+
+	//load story from DB
 	loadStory(ref, story){
 		this.storyRef = ref;
+		this.authors = story.authors;
 		this.name = story.name;
 		this.config = story.config;
 		this.characters = story.characters;
@@ -311,13 +320,69 @@ class Editor extends Story{
 	}
 
 	loadEditor(){
+		this.loadAuthors();
 		this.loadCharacters();
 		this.loadMessages();
 	}
 
-	StartStoryEditor(){
-		$("#chat").empty();
-		this.playStory();
+	authorItemDom(author){
+		var authorItem = $(`
+			<li class="list-group-item d-flex align-items-center author">
+				<div class="flex-grow-1 text">${author}</div>
+				<button class="btn btn-secondary authorDelete"><i class="fas fa-times"></i></button>
+			</li>`);
+	    $(authorItem).find('.authorDelete').click(function(){editor.DeleteAuthor(author)});
+		return authorItem;
+	}
+
+	loadAuthors(){
+		$("#authorsList").empty();
+		for(var author of this.authors){
+			let authorItem = this.authorItemDom(author.id);
+			$("#authorsList").append(authorItem);
+		}
+	}
+
+	AddAuthor(author){
+		console.log(author)
+		if(validateEmail(author)){
+			if(this.authors.findIndex(ref => ref.id === author) == -1){
+		        db.collection('users').doc(author).get().then(doc => {
+		            if (!doc.exists) {
+		            	console.log("new user");
+		                doc = db.collection("users").doc(author).set({});
+		            }
+					this.authors.push(doc.ref);
+					let authorItem = this.authorItemDom(doc.id);
+					$("#authorsList").append(authorItem);
+					if(this.storyRef){
+						db.collection("stories").doc(this.storyRef).update({
+							authors: this.authors
+						});
+					}
+		        })
+		        .catch(err => {
+		            console.log('Error getting document', err);
+		        });
+			}else{
+	        	alert("Cette personne est déjà un auteur de la story");
+			}
+	    }else{
+	        alert("email invalide");
+	    }
+	}
+
+	DeleteAuthor(author){
+		if(login != author){
+			let id = this.authors.findIndex(ref => ref.id === author);
+			this.authors.splice(id, 1);
+			$(`.author:nth-child(${id+1})`).remove();
+			db.collection("stories").doc(this.storyRef).update({
+				authors: this.authors
+			});
+		}else{
+			alert("Vous ne pouvez pas vous supprimer l'accès a votre propre story.");
+		}
 	}
 
 	loadCharacters(){

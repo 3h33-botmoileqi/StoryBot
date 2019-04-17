@@ -55,7 +55,7 @@
 	                </div>
 	            </nav>
 	            <div id="mainContent">
-	            	<div id="chatPanel" class="page">
+	            	<div id="chatPanel" class="page" style="display: none;">
 	            		<div class="editorMode">
 	            			Visualisation
 	            			<div class="form-check">
@@ -229,6 +229,14 @@
 									<input type="range" class="form-control-range" id="adsEachMessagesInput" name="adsEachMessages" oninput="adsEachMessagesOutput.value = adsEachMessagesInput.value" value="1" min="1" max="100">
 								</div>
 							</div>
+							<div id="authorsForm" class="form-group" style="display: none">
+								<label>Liste des auteurs</label>
+								<div  class="d-flex">
+		        					<input type="text" id="authorAdd" name="authorAdd" placeholder="Ajouter..." style="width: 100%">
+		        					<button class="btn-dark" onclick="editor.AddAuthor($('#authorAdd').val().toLowerCase());"><i class="fas fa-plus"></i></button>
+		        				</div>
+								<ul id="authorsList" class="list-group authorsList"></ul>
+							</div>
 							<input class="btn btn-primary" type="submit" name="configSubmit">
 			        	</form>
 			        	<div style="position: absolute;right: 5vw;bottom: 5vh;">
@@ -283,6 +291,10 @@
 		        			<div class="form-group">
 		        				<label>Email</label>
 							    <input type="text" name="login" id="login"  class="form-control" required/>
+				        		<div class="form-check">
+					        		<input class="form-check-input" type="checkbox" name="remember">
+				        			<label class="form-check-label">Se souvenir de moi</label>
+				        		</div>
 							    <!--<input type="password" name="pass" id="pass" />-->
 							</div>
 							<input class="btn btn-primary" type="submit"/>
