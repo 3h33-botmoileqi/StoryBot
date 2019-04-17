@@ -559,7 +559,7 @@ class Editor extends Story{
 			{type:msgForm["payload-type"].value, url:msgForm["payload-url"].value},
 			new Date($('#datetimepicker1').datetimepicker('viewDate')).getTime() /1000,
 			msgForm["delay"].value * 1000,
-			msgForm["tapeFlag"].value,
+			msgForm["tapeFlag"].checked,
 			msgForm["adsFlag"].value
 			);	
 		if(isNew === "true"){
