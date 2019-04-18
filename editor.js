@@ -53,6 +53,7 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 let login = null;
+let loginRef = null;
 function loginFormSubmit(){
     login = document.forms["loginForm"]["login"].value.toLowerCase();
     if(validateEmail(login)){
@@ -62,6 +63,7 @@ function loginFormSubmit(){
                 db.collection("users").doc(login).set({});
             }
             if(document.forms["loginForm"]["remember"].checked)
+                loginref = doc.ref;
                 localStorage["lastLogin"] = login;
             loginAccepted(login)
         })
@@ -90,15 +92,28 @@ function loadStories(login){
             </li>`);
           return;
         }
-        snapshot.forEach(doc => {   
+        snapshot.forEach(doc => {
+            //dom Element 
             var storyItem = $(`
                 <li class="list-group-item d-flex align-items-center story ${doc.id == editor.storyRef ? "active" : ""}">
                     <div class="flex-grow-1 text">${doc.data().name}</div>
                     <div class="btn-group">
-                        <button class="btn btn-secondary storyLoad" onclick="loadStory('${doc.id}');$('.story').removeClass('active');$(this).closest('.story').addClass('active');"><i class="fas fa-edit"></i></button>
-                        <button class="btn btn-secondary storyLoad" onclick="deleteStory('${doc.id}');$(this).closest('.story').remove();"><i class="fas fa-times"></i></button>
+                        <button class="btn btn-secondary storyLoad" onclick=""><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-secondary storyDelete" onclick=""><i class="fas fa-times"></i></button>
                     </div>
                 </li>`);
+            //Load Event
+            storyItem.find(".storyLoad").click(function(){
+                loadStoryConfirm(doc.id);
+                $('.story').removeClass('active');
+                storyItem.addClass('active');
+            });
+            //DeleteEvent
+            storyItem.find(".storyDelete").click(function(){
+                console.log("delete");
+                deleteStory(doc.id, function(){storyItem.remove()});
+            });
+            //Add to Dom
             $("#storiesList").append(storyItem);
         });
     })
@@ -107,20 +122,33 @@ function loadStories(login){
   });
 }
 
-function loadStory(storyRef, needConfirm = true){
+function loadStoryConfirm(storyRef, needConfirm = true){
     if(needConfirm){
         var answer = confirm("Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?")
         if(answer){
-            saveStory(login);
+            saveStory(login, function(){
+                loadStory(storyRef, needConfirm);
+            });
+        }
+        else{
+            loadStory(storyRef, needConfirm)
         }
     }
+}
+
+function loadStory(storyRef, needConfirm){
     if(storyRef !== null){
         db.collection('stories').doc(storyRef).get().then((doc) => {
-            editor.loadStory(storyRef, doc.data());
-            if(needConfirm)
-                alert("Story chargée avec succès");
-            editor.changePanel("#chatPanel");
-            editor.StartStoryEditor();
+            if(doc.exists){
+                editor.loadStory(storyRef, doc.data());
+                if(needConfirm)
+                    alert("Story chargée avec succès");
+                editor.changePanel("#chatPanel");
+                editor.StartStoryEditor();
+            }
+            /*else{
+                delete localStorage["lastStory"];
+            }*/
         })
         .catch(err => {
             console.log('Error getting documents', err);
@@ -128,44 +156,86 @@ function loadStory(storyRef, needConfirm = true){
     }
     else{
         editor = new Editor();
+        editor.storyRef = null;
+        editor.AddAuthor(login);
         editor.changePanel("#chatPanel");
         editor.StartStoryEditor();
     }
 }
 
-function deleteStory(storyRef){
+function deleteStory(storyRef, callback){
     db.collection("stories").doc(storyRef).get().then(doc => {
-        var answer = prompt(`Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en inséré "supprimer" ci-dessous.`)
-        if(answer.toLowerCase() == "supprimer"){
-            doc.ref.delete();
+        if(doc.exists){
+            var answer = prompt(`Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en inséré "supprimer" ci-dessous.`)
+            if(answer.toLowerCase() == "supprimer"){
+                if(localStorage["lastStory"] == doc.id){
+                    delete localStorage["lastStory"];
+                 }
+                doc.ref.delete();
+                callback();
+            }
         }
     })
     .catch(err => {
-        console.log('Error getting documents', err);
+        console.log('Error deleting document', err);
     })
 }
 
-function saveStory(login){
-    var docRef = db.collection("users").doc(login);
-    if(editor.storyRef !== null){
-        db.collection("stories").doc(editor.storyRef).update({
+function saveStory(login, callback = null){
+    if(editor.storyRef != null){
+        db.collection("stories").doc(editor.storyRef).get().then(doc => {
+            if(doc.exists){
+                doc.ref.update({
+                    name: editor.name,
+                    config: editor.config,
+                    characters: editor.characters,
+                    conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
+                })
+                localStorage["lastStory"] = doc.id;
+                if(callback != null){
+                    callback();
+                }
+            }else{
+                db.collection("stories").add({
+                    authors: editor.authors,
+                    name: editor.name,
+                    config: editor.config,
+                    characters: editor.characters,
+                    conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
+                }).then(doc => {
+                    localStorage["lastStory"] = doc.id;
+                    editor.storyRef = doc.id;
+                    loadStories(login);
+                    if(callback != null){
+                        callback();
+                    }
+                })
+                .catch(err => {
+                    console.log('Error adding document', err);
+                })
+            }
+        })
+        .catch(err => {
+            console.log('Error updating document '+editor.storyRef, err);
+        });
+    }else{
+        db.collection("stories").add({
+            authors: editor.authors,
             name: editor.name,
             config: editor.config,
             characters: editor.characters,
             conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
-        });
-  }
-  else{
-    editor.storyRef = db.collection("stories").add({
-        authors: editor.authors,
-        name: editor.name,
-        config: editor.config,
-        characters: editor.characters,
-        conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
-    });
-    loadStories(login);
-  }
-  localStorage["lastStory"] = editor.storyRef;
-}
+        }).then(doc => {
+            localStorage["lastStory"] = doc.id;
+            editor.storyRef = doc.id;
+            loadStories(login);
+            if(callback != null){
+                callback();
+            }
+        })
+        .catch(err => {
+            console.log('Error adding document', err);
+        })
+    }}
 
 /**************************************************************/

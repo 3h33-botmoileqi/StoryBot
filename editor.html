@@ -232,7 +232,7 @@
 								<label>Liste des auteurs</label>
 								<div  class="d-flex">
 		        					<input type="text" id="authorAdd" name="authorAdd" placeholder="Ajouter..." style="width: 100%">
-		        					<button class="btn-dark" onclick="editor.AddAuthor($('#authorAdd').val().toLowerCase());"><i class="fas fa-plus"></i></button>
+		        					<button class="btn-dark" onclick="editor.AddAuthor($('#authorAdd').val().toLowerCase());$('#authorAdd').val('');"><i class="fas fa-plus"></i></button>
 		        				</div>
 								<ul id="authorsList" class="list-group authorsList"></ul>
 							</div>
@@ -302,7 +302,7 @@
 		        	<div id="cloudPanel" class="page" style="display:none">
 		        		<div  class="d-flex">
         					<input type="text" name="storyFilter" placeholder="Recherche..." style="width: 100%">
-        					<button class="btn-dark" onclick="loadStory(null)"><i class="fas fa-plus"></i></button>
+        					<button class="btn-dark" onclick="loadStoryConfirm(null)"><i class="fas fa-plus"></i></button>
         				</div>
 						<ul id="storiesList" class="list-group"></ul>
 		        	</div>
