@@ -97,7 +97,7 @@ function loadStories(login){
         snapshot.forEach(doc => {
             //dom Element 
             var storyItem = $(`
-                <li class="list-group-item d-flex align-items-center story ${doc.id == editor.storyRef ? "active" : ""}">
+                <li id="${doc.id}" class="list-group-item d-flex align-items-center story ${doc.id == editor.storyRef ? "active" : ""}">
                     <div class="flex-grow-1 text">${doc.data().name}</div>
                     <div class="btn-group">
                         <button class="btn btn-secondary storyLoad" onclick=""><i class="fas fa-edit"></i></button>
@@ -107,12 +107,10 @@ function loadStories(login){
             //Load Event
             storyItem.find(".storyLoad").click(function(){
                 loadStoryConfirm(doc.id);
-                $('.story').removeClass('active');
-                storyItem.addClass('active');
             });
             //DeleteEvent
             storyItem.find(".storyDelete").click(function(){
-                deleteStory(doc.id, function(){storyItem.remove()});
+                deleteStory(doc.id);
             });
             //Add to Dom
             $("#storiesList").append(storyItem);
@@ -124,27 +122,30 @@ function loadStories(login){
 }
 
 function loadStoryConfirm(storyRef, needConfirm = true){
-    if(needConfirm){
-        var answer = confirm("Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?")
-        if(answer){
-            saveStory(login, function(){
-                loadStory(storyRef, needConfirm);
-            });
+    ConfirmDialog(
+        "Chargement d'une story",
+        "Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?",
+        function(answer){
+            if(answer){
+                saveStory(login, function(){
+                    loadStory(storyRef);
+                });
+            }
+            else{
+                loadStory(storyRef)
+            }
+            $('.story').removeClass('active');
+            $(`#${storyRef}`).addClass('active');
         }
-        else{
-            loadStory(storyRef, needConfirm)
-        }
-    }
+    );
 }
 
-function loadStory(storyRef, needConfirm){
+function loadStory(storyRef){
     if(storyRef !== null){
         db.collection('stories').doc(storyRef).get().then((doc) => {
             if(doc.exists){
                 editor.loadStory(storyRef, doc.data());
                 localStorage["lastStory"] = storyRef;
-                if(needConfirm)
-                    alert("Story chargée avec succès");
                 editor.changePanel("#chatPanel");
                 editor.StartStoryEditor();
             }
@@ -165,17 +166,23 @@ function loadStory(storyRef, needConfirm){
     }
 }
 
-function deleteStory(storyRef, callback){
+function deleteStory(storyRef){
     db.collection("stories").doc(storyRef).get().then(doc => {
         if(doc.exists){
-            var answer = prompt(`Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en inséré "supprimer" ci-dessous.`)
+            /*var answer = prompt(`Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en inséré "supprimer" ci-dessous.`)
             if(answer.toLowerCase() == "supprimer"){
-                if(localStorage["lastStory"] == doc.id){
-                    delete localStorage["lastStory"];
-                 }
-                doc.ref.delete();
-                callback();
-            }
+            }*/
+            ConfirmDeleteDialog(
+                "Suppresion d'une Story",
+                `Vous êtes sur le point de supprimer la story \"${doc.data().name}\". Confirmer la suppression en insérant <b>"supprimer"</b> ci-dessous.`,
+                function(){
+                    if(localStorage["lastStory"] == doc.id){
+                        delete localStorage["lastStory"];
+                     }
+                    $(`#${doc.id}`).remove();
+                    doc.ref.delete();
+                }
+            );
         }
     })
     .catch(err => {
@@ -241,3 +248,62 @@ function saveStory(login, callback = null){
     }}
 
 /**************************************************************/
+
+function ConfirmDialog(title, message, callback) {
+    $('<div></div>').appendTo('body')
+    .html('<div><h6>'+message+'</h6></div>')
+    .dialog({
+        modal: false, title: title, zIndex: 10000, autoOpen: true,
+        width: 'auto', resizable: false,
+        buttons: {
+            Oui: {
+                click:function () {     
+                    $(this).dialog("close");
+                    callback(true)
+                },
+                text: "Oui",
+                class: 'btn btn-success'
+            },
+            Non: {
+                click:function () {     
+                    $(this).dialog("close");
+                    callback(false)
+                },
+                text:"Non",
+                class: 'btn btn-danger'
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        }
+    });
+};
+
+function ConfirmDeleteDialog(title, message, callback) {
+    $('<div></div>').appendTo('body')
+    .html('<div><h6>'+message+'</h6><br><label>Confirmation : </label> <input type="text" id="confirmDelete"></div>')
+    .dialog({
+        modal: false,
+        title: title,
+        zIndex: 10000,
+        autoOpen: true,
+        width: 'auto',
+        resizable: false,
+        buttons: {
+            confirm: {
+                click:function () {
+                    if($("#confirmDelete").val() === "supprimer"){
+                        callback();
+                    }
+                    $(this).dialog("close");
+                },
+                text: "Supprimer",
+                class: 'btn btn-danger'
+            }
+        },
+        close: function (event, ui) {
+            $(this).remove();
+        },
+    });
+};
+
