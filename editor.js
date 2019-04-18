@@ -17,7 +17,9 @@ $(function () {
 });
 
 let editor;
-$(document).ready(function () {//Height adjust
+$(document).ready(function () {
+    $(".buttonPage").click(function(){$(".buttonPage").removeClass("active");$(this).addClass("active")})
+    //Height adjust
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
     window.addEventListener('resize', () => {
