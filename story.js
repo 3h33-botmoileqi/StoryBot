@@ -313,6 +313,7 @@ class Editor extends Story{
 		this.name = story.name;
 		this.config = story.config;
 		this.characters = story.characters;
+		this.conversation = [];
 		for(let message of story.conversation){
 			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false));
 		}
@@ -350,16 +351,26 @@ class Editor extends Story{
 		        db.collection('users').doc(author).get().then(doc => {
 		            if (!doc.exists) {
 		            	console.log("new user");
-		                doc = db.collection("users").doc(author).set({});
+		                db.collection("users").doc(author).set({}).then(doc =>{
+							this.authors.push(doc.ref);
+							let authorItem = this.authorItemDom(doc.id);
+							$("#authorsList").append(authorItem);
+							if(this.storyRef){
+								db.collection("stories").doc(this.storyRef).update({
+									authors: this.authors
+								});
+							}
+		                });
+		            }else{
+						this.authors.push(doc.ref);
+						let authorItem = this.authorItemDom(doc.id);
+						$("#authorsList").append(authorItem);
+						if(this.storyRef){
+							db.collection("stories").doc(this.storyRef).update({
+								authors: this.authors
+							});
+						}
 		            }
-					this.authors.push(doc.ref);
-					let authorItem = this.authorItemDom(doc.id);
-					$("#authorsList").append(authorItem);
-					if(this.storyRef){
-						db.collection("stories").doc(this.storyRef).update({
-							authors: this.authors
-						});
-					}
 		        })
 		        .catch(err => {
 		            console.log('Error getting document', err);
@@ -420,7 +431,8 @@ class Editor extends Story{
 		let isNew = charaForm["isNew"].value;
 		let characterNameOld = charaForm["characterName"].value;
 		let characterName = charaForm["name"].value;
-		let character = {avatar: charaForm["avatar"].value, defaultSide: charaForm["defaultSide"].value}
+		let characterAvatar = charaForm["avatar"].value ? charaForm["avatar"].value : "https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png";
+		let character = {avatar: characterAvatar, defaultSide: charaForm["defaultSide"].value}
 		if(isNew === "true"){
 			this.insertCharacterEditor(character, characterName);
 		}
@@ -514,6 +526,7 @@ class Editor extends Story{
 	}
 
 	messageItemDom(message, index){
+		console.log(message.character);
 		let messageItem = $(
 			`<li class="list-group-item d-flex align-items-center">
 				<img class="avatar" src="${this.characters[message.character].avatar}"/>
@@ -582,8 +595,8 @@ class Editor extends Story{
 	}
 
 	DeleteMessageEditor(id){
-		this.DeleteMessageElement(id);
-		$(`#messageList>li:nth-child(${id+1})`).remove();
+		this.conversation.splice(id, 1);
+		this.GetMessageListElementById(id).remove();
 	}
 
 	LoadSelectedMessage(id, isNew = false){
