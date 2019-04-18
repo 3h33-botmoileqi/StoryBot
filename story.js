@@ -322,7 +322,7 @@ class Message{
                     return '<audio controls><source src="'+this.payload.url+'" type="audio/mpeg">Your browser does not support the audio element.</audio>';
                     break;
                 default:
-                	return null;
+                	return "";
             }
 		}
 	}
@@ -367,8 +367,8 @@ class Editor extends Story{
 
 	loadEditor(){
 		this.loadAuthors();
-		this.loadCharacters();
 		this.loadMessages();
+		this.loadCharacters();
 	}
 
 	authorItemDom(author){
@@ -536,7 +536,7 @@ class Editor extends Story{
 	}
 
 	LoadSelectedCharacter(characterName, isNew = false){
-		$(".characterListContainer").hide();
+		$(".page").hide();
 		$(".characterFormContainer").show();
 
 		let charaForm = document.forms["characterForm"];
@@ -559,21 +559,36 @@ class Editor extends Story{
 			let messageItem = this.messageItemDom(this.conversation[i], i);
 			$("#messageList").append(messageItem);
 		}
+		let quickMessageForm = $(
+			`<li class="list-group-item">
+				<form id="quickMessageForm" name="quickMessageForm" class="form-inline" onsubmit="editor.quickMessageFormSubmit();return false;">
+					<select class="form-control characterList" name="character" required></select>
+					<input type="text" id="quickText" name="text" hidden>
+					<div id="editableQuickText" class="flex-grow-1 text" contenteditable="true" oninput="quickText.value = this.innerHTML;" style="outline: -webkit-focus-ring-color auto 5px;"></div>
+					<button type="submit" class="btn btn-dark"><i class="fas fa-plus"></i></button>
+				</form>
+			</li>`);
+		$("#messageList").append(quickMessageForm);
+		this.MessagelistScrollDown();
+	}
+
+	MessagelistScrollDown(){
+		$("#messageList").animate( { width: "ease-out",scrollTop: $("#messageList").prop('scrollHeight') }, 750 ); // Go
 	}
 
 	GetIdByMessageListElement(element){
-		return $(element).index('#messageList>li');
+		return $(element).index('#messageList>.messageItem');
 	}
 
 	GetMessageListElementById(id){
-		return $($(`#messageList>li`).get(id));
+		return $($(`#messageList>.messageItem`).get(id));
 	}
 
 	messageItemDom(message, index){
 		let messageItem = $(
-			`<li class="list-group-item d-flex align-items-center">
+			`<li class="list-group-item d-flex align-items-center messageItem">
 				<img class="avatar" src="${this.characters[message.character].avatar}"/>
-				<div class="flex-grow-1 text" contenteditable="true">${message.text ? message.text : message.payload.type}</div>
+				<div class="flex-grow-1 text" contenteditable="true">${message.text ? message.text : (message.payload.type ? message.payload.type : "")}</div>
 				<div class="btn-group tools">
 					<button class="btn btn-secondary messageView"><i class="fas fa-eye"></i></button>
 					<button class="btn btn-secondary messageEdit"><i class="fas fa-edit"></i></button>
@@ -603,11 +618,30 @@ class Editor extends Story{
 		}
 	}
 
+	quickMessageFormSubmit(){
+		let msgForm = document.forms["quickMessageForm"];
+		let text = msgForm["text"].value;
+		console.log(text)
+		let message = new Message(
+			msgForm["character"].value,
+			this.characters[msgForm["character"].value].defaultSide,
+			text,
+			{},
+			new Date().getTime() /1000,
+			0,
+			false,
+			false
+			);
+		this.insertMessageEditor(this.conversation.length, message);
+		msgForm["text"].value = "";
+		$("#editableQuickText").text("");
+		this.MessagelistScrollDown();
+	}
+
 	messageFormSubmit(){
 		let msgForm = document.forms["messageForm"];
 		let isNew = msgForm["isNew"].value;
 		let id = msgForm["messageId"].value;
-		console.log(new Date($('#datetimepicker1').datetimepicker('viewDate')).getTime() /1000);
 		let message = new Message(
 			msgForm["character"].value,
 			msgForm["side"].value,
@@ -626,10 +660,12 @@ class Editor extends Story{
 
 		$(".messageFormContainer").hide();
 		$(".messageListContainer").show();
+		this.MessagelistScrollDown();
 	}
 	insertMessageEditor(id, message){
 		this.conversation.splice(id,0 ,message);
-		$("#messageList").append(this.messageItemDom(message, id));
+		console.log(message);
+		$("#messageList>.messageItem").last().after(this.messageItemDom(message, id));
 	}
 
 	editMessageEditor(id, message){

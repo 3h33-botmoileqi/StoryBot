@@ -75,8 +75,8 @@
 		        	</div>
         			<div  id="messagePanel" class="page messageListContainer" style="display: none;">
         				<div  class="d-flex">
-        					<input type="text" name="messageFilter" placeholder="Recherche..." style="width: 100%">
         					<button class="btn-dark" onclick="editor.LoadSelectedMessage(editor.conversation.length, true);"><i class="fas fa-plus"></i></button>
+        					<input type="text" name="messageFilter" placeholder="Recherche..." style="width: 100%">
         				</div>
         				<ul id="messageList" class="list-group">
         					
@@ -87,9 +87,10 @@
 		        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
 		        			<input type="text" name="messageId" hidden>
 		        			<input type="checkbox" name="isNew" hidden>
-		        			<div class="form-group">
-		        				<label>Personnage :</label>
-		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide"></select>
+		        			<div class="form-row  align-items-center">
+		        				<label>Personnage : </label>
+		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide" style="width: 50vw"></select>
+        						<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);return false;"><i class="fas fa-plus"></i></button>
 		        			</div>
         					<div class="form-group">
 	        					<label>Coté du chat :</label>
@@ -163,8 +164,8 @@
         			</div>
         			<div id="characterPanel" class="page characterListContainer" style="display: none;">
         				<div  class="d-flex">
-        					<input type="text" name="characterFilter" placeholder="Recherche..." style="width: 100%">
         					<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);"><i class="fas fa-plus"></i></button>
+        					<input type="text" name="characterFilter" placeholder="Recherche..." style="width: 100%">
         				</div>
         				<ul id="mainCharacterList" class="list-group characterList">
         					
