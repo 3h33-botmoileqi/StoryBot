@@ -390,7 +390,6 @@ class Editor extends Story{
 	}
 
 	AddAuthor(author){
-		console.log(author)
 		if(validateEmail(author)){
 			if(this.authors.findIndex(ref => ref.id === author) == -1){
 		        db.collection('users').doc(author).get().then(doc => {

@@ -143,8 +143,8 @@
 				                </div>
         					</div>
 							<div class="form-group">
-								<label for="formControlRange">Délai : <output id="delayOutput">0 sec</output></label>
-								<input type="range" class="form-control-range" id="delayInput" name="delay" oninput="delayOutput.value = delayInput.value + ' sec'" value="0" min="0" max="60">
+								<label for="formControlRange">Délai : <input type="number" id="delayOutput" name="delay" min="0"> sec<input type="range" class="form-control-range" id="delayInput"oninput="delayOutput.value = delayInput.value" value="0" min="0" max="60"></label>
+								
 	        					<div class="form-check"  hidden="true">
 								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
 								  <label class="form-check-label" for="defaultCheck1">

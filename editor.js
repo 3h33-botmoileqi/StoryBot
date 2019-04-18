@@ -110,7 +110,6 @@ function loadStories(login){
             });
             //DeleteEvent
             storyItem.find(".storyDelete").click(function(){
-                console.log("delete");
                 deleteStory(doc.id, function(){storyItem.remove()});
             });
             //Add to Dom
@@ -141,6 +140,7 @@ function loadStory(storyRef, needConfirm){
         db.collection('stories').doc(storyRef).get().then((doc) => {
             if(doc.exists){
                 editor.loadStory(storyRef, doc.data());
+                localStorage["lastStory"] = storyRef;
                 if(needConfirm)
                     alert("Story chargée avec succès");
                 editor.changePanel("#chatPanel");
