@@ -418,7 +418,8 @@ class Editor extends Story{
 			if(message.animations)
 				this.conversation[this.conversation.length-1].AddAnimations(message.animations);
 		}
-		this.loadEditor();
+		if(this.editor)
+			this.loadEditor();
 	}
 
 	loadEditor(){
