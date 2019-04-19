@@ -662,7 +662,7 @@ class Editor extends Story{
 			{},
 			new Date().getTime() /1000,
 			0,
-			false,
+			true,
 			false
 			);
 		this.insertMessageEditor(this.conversation.length, message);
