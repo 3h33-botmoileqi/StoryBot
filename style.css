@@ -259,7 +259,7 @@ a.article:hover {
     list-style-type: none;
     /* overflow: auto; */
     padding-inline-start: 0px;
-    min-height: 92vh;
+    /* min-height: 90vh; */
     margin: 0;
 }
 .messagesGroup>ul{

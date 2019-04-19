@@ -18,7 +18,8 @@ $(function () {
 
 let editor;
 $(document).ready(function () {
-    $(".buttonPage").click(function(){$(".buttonPage").removeClass("active");$(this).addClass("active")})
+    $(".buttonPage").click(function(){$(".buttonPage").removeClass("active");$(this).addClass("active")});
+    $("#chatPanel").click(function(){if(editor.tapeRequiredFlag){editor.StoryNextMessage(true)}})
     //Height adjust
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -47,7 +48,7 @@ $(document).ready(function () {
     CodeMirror.on("change", function(cm){
         editor.loadCSS(cm.getValue());
     });
-	editor.playStory();
+	editor.StartStoryEditor();
 });
 /****************** Date Management ***************************/
 function validateEmail(email) {

@@ -12,6 +12,9 @@ class Story {
 		this.conversation = [];
 		this.messagesGroup = [];
 		this.chatElement = $('#chat');
+		this.tapeRequiredFlag = false;
+		this.currentMessagesGroup = null;
+		this.lastCharacter = null;
 		this.id =0;
 		this.resumeId = 0;
 		this.editor = false;
@@ -62,6 +65,10 @@ class Story {
 /*Bloc message droit*/
 .message-right .message-container{
   
+}
+/*Arrière plans */
+#chatPanel, #example{
+
 }`;
 		//this.loadDemo();
 	}
@@ -75,42 +82,43 @@ class Story {
 		console.log(this);
 	}
 
-	waitFor(delay) {
-	    return new Promise(resolve => {
+	waitFor(initialState, delay, callback) {
+	    return new Promise((resolve,reject) => {
 	      setTimeout(() => {
-	        resolve('resolved');
+	      	if(initialState == this.editor){
+	      		callback();
+	        	resolve('delayed');
+	      	}
 	      }, delay);
-	    });
+	    }).catch(err => console.log(err));
 	  }
 
 	async playStory(id = 0){
 		this.id = id;
-		$(this.chatElement).empty();
 		if(this.conversation.length){
 			this.generateMessagesGroup();
-			var messagesGroup = null;
-			var lastCharacter = this.conversation[0].character;
-		    let tapeRequiredFlag = false;
-		    while(this.id < this.conversation.length && !tapeRequiredFlag){
-		      if(this.conversation[this.id].tapeFlag){
-		          tapeRequiredFlag = true;
-		      }else{
-		        await this.waitFor(this.editor || this.id < this.resumeId ? 0 : this.conversation[this.id].delay);
-		        //this.insertChat(array[this.state.displayStory.length], true)
-		        //chatElement.append(this.conversation[this.id].output());
-		        //console.log(this.id);
-		        if(messagesGroup == null || this.conversation[this.id].character !== lastCharacter){
-		        	lastCharacter = this.conversation[this.id].character;
-		        	messagesGroup = this.MessageGroupDom(this.conversation[this.id].side, lastCharacter)
-		        	$(this.chatElement).append(messagesGroup);
-		        }
-		        this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(messagesGroup).children("ul"));
-		        //$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
-		        var page = $(this).attr('href'); // Page cible
-				var speed = 400; // Durée de l'animation (en ms)
-				$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
-		        this.id++;
-		      }
+		    while(this.id < this.conversation.length && (!this.tapeRequiredFlag || this.editor)){
+				if(this.conversation[this.id].tapeFlag && !this.editor){
+					this.tapeRequiredFlag = true;
+				}else{
+					await this.waitFor(this.editor, this.editor || this.id < this.resumeId ? 0 : this.conversation[this.id].delay, ()=>{this.StoryNextMessage()});
+					//this.StoryNextMessage();
+					//this.insertChat(array[this.state.displayStory.length], true)
+					//chatElement.append(this.conversation[this.id].output());
+					//console.log(this.id);
+					/*console.log(this.currentMessagesGroup)
+					if(this.currentMessagesGroup == null || this.conversation[this.id].character !== this.lastCharacter){
+						this.lastCharacter = this.conversation[this.id].character;
+						this.currentMessagesGroup = this.MessageGroupDom(this.conversation[this.id].side, this.lastCharacter)
+						$(this.chatElement).append(this.currentMessagesGroup);
+					}
+					this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(this.currentMessagesGroup).children("ul"));
+					//$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
+					var page = $(this).attr('href'); // Page cible
+					var speed = 400; // Durée de l'animation (en ms)
+					$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
+					this.id++;*/
+				}
 		    }
 		}
 	    //Si la story est fini sinon attend un touch
@@ -119,6 +127,31 @@ class Story {
 	      console.log('Done!');
 	    */
 	}
+
+	StoryNextMessage(OnTape = false){
+		try{
+			this.currentMessagesGroup = $("#chat .messagesGroup").length ? $("#chat .messagesGroup").last() : null;
+			if(this.currentMessagesGroup == null || this.conversation[this.id].character !== this.lastCharacter){
+				this.lastCharacter = this.conversation[this.id].character;
+				this.currentMessagesGroup = this.MessageGroupDom(this.conversation[this.id].side, this.lastCharacter)
+				$(this.chatElement).append(this.currentMessagesGroup);
+			}
+			this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(this.currentMessagesGroup).children("ul"));
+			//$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
+			var page = $(this).attr('href'); // Page cible
+			var speed = 400; // Durée de l'animation (en ms)
+			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
+			this.id++;
+			if(OnTape){
+				this.tapeRequiredFlag = false;
+				this.playStory(this.id);
+			}
+		}
+		catch(err){
+			console.log(err);
+		}
+	}
+
 	/******************* Character Management ***********************/
 
 	DeleteCharacter(characterName){
@@ -694,7 +727,7 @@ class Editor extends Story{
 		quill.root.innerHTML = "";
 		$('#datetimepicker1').datetimepicker('date', new Date());
 		msgForm["delay"].value = 0;
-		msgForm["tapeFlag"].checked = false;
+		msgForm["tapeFlag"].checked = true;
 		msgForm["adsFlag"].checked = false;
 		if(!isNew){
 			let msg = this.conversation[id];
