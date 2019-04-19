@@ -244,13 +244,22 @@ a.article:hover {
     padding: 10px;
 }
 
+#chatPanel    {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+#chatPanel::-webkit-scrollbar { 
+    display: none;
+}
+
+
 #chat, #example{
     display: flex;
     flex-direction: column;
     list-style-type: none;
     /* overflow: auto; */
     padding-inline-start: 0px;
-    /* height: 92vh; */
+    min-height: 92vh;
     margin: 0;
 }
 .messagesGroup>ul{

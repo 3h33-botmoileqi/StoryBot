@@ -663,9 +663,8 @@ class Editor extends Story{
 		this.MessagelistScrollDown();
 	}
 	insertMessageEditor(id, message){
+		$("#messageList>li").last().before(this.messageItemDom(message, id));
 		this.conversation.splice(id,0 ,message);
-		console.log(message);
-		$("#messageList>.messageItem").last().after(this.messageItemDom(message, id));
 	}
 
 	editMessageEditor(id, message){
