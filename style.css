@@ -262,6 +262,40 @@ a.article:hover {
     /* min-height: 90vh; */
     margin: 0;
 }
+#tapeLogo{
+    font-size: 4em;
+    position: absolute;
+    left:50%;
+    top:50%;
+    /*transform: translate(-50%,-50%);*/
+
+    animation: heartbeat 1.5s ease-in-out infinite both;
+}
+
+@keyframes heartbeat {
+  from {
+    transform: scale(1);
+    transform-origin: center center;
+    animation-timing-function: ease-out;
+  }
+  10% {
+    transform: scale(0.91);
+    animation-timing-function: ease-in;
+  }
+  17% {
+    transform: scale(0.98);
+    animation-timing-function: ease-out;
+  }
+  33% {
+    transform: scale(0.87);
+    animation-timing-function: ease-in;
+  }
+  45% {
+    transform: scale(1);
+    animation-timing-function: ease-out;
+  }
+}
+
 .messagesGroup>ul{
     padding-inline-start: 0px;
 }
@@ -390,6 +424,14 @@ a.article:hover {
     margin: 0 2vh;
     /* height: 100%; */
     max-width: 68vw;
+}
+
+/*-----------------------------------------
+    MessageForm
+------------------------------------------*/
+.messageFormContainer .CodeMirror{
+    width: 40vw;
+    height: 20vh;
 }
 /*----------------------------------------
     CharacterList

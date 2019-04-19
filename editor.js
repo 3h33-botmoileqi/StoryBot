@@ -1,7 +1,16 @@
-var CodeMirror = CodeMirror.fromTextArea(document.getElementById('cssEditor'), {
+var CodeMirrorCustomCSS = CodeMirror.fromTextArea(document.getElementById('cssEditor'), {
   mode:  "css",
   lineNumbers: true,
   autofocus: true,
+  autoCloseBrackets: true,
+  colorpicker : {
+      mode : 'edit'
+  },
+});
+
+var CodeMirrorAnimations = CodeMirror.fromTextArea(document.getElementById('animationsEditor'), {
+  mode:  "javascript",
+  lineNumbers: true,
   autoCloseBrackets: true,
   colorpicker : {
       mode : 'edit'
@@ -19,7 +28,7 @@ $(function () {
 let editor;
 $(document).ready(function () {
     $(".buttonPage").click(function(){$(".buttonPage").removeClass("active");$(this).addClass("active")});
-    $("#chatPanel").click(function(){if(editor.tapeRequiredFlag){editor.StoryNextMessage(true)}})
+    $("#chatPanel").click(function(){if(editor.tapeRequiredFlag){editor.StoryNextMessage(true);$("#tapeLogo").hide();}})
     //Height adjust
     let vh = window.innerHeight * 0.01;
     document.documentElement.style.setProperty('--vh', `${vh}px`);
@@ -44,8 +53,8 @@ $(document).ready(function () {
         editor.changePanel("#loginPanel");
 
     //link css editor with custom css
-    CodeMirror.setValue(editor.config['customCSS']);
-    CodeMirror.on("change", function(cm){
+    CodeMirrorCustomCSS.setValue(editor.config['customCSS']);
+    CodeMirrorCustomCSS.on("change", function(cm){
         editor.loadCSS(cm.getValue());
     });
 	editor.StartStoryEditor();

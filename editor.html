@@ -74,6 +74,7 @@
 							</div>
 	            		</div>
 		            	<ul id="chat" style="/*background:grey;width:100%;height:3000px*/"></ul>
+		            	<i id="tapeLogo" class="fas fa-hand-point-up" style="display: none;"></i>
 		        	</div>
         			<div  id="messagePanel" class="page messageListContainer" style="display: none;">
         				<div  class="d-flex" style="margin-bottom: 1vh">
@@ -89,9 +90,9 @@
 		        		<form name="messageForm" onsubmit="editor.messageFormSubmit();return false;">
 		        			<input type="text" name="messageId" hidden>
 		        			<input type="checkbox" name="isNew" hidden>
-		        			<div class="form-row  align-items-center">
+		        			<div class="form-row form-group">
 		        				<label>Personnage : </label>
-		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide" style="width: 50vw" required></select>
+		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide" required style="max-width: 50vw"></select>
         						<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);return false;"><i class="fas fa-plus"></i></button>
 		        			</div>
         					<div class="form-group">
@@ -145,23 +146,33 @@
 				                    </div>
 				                </div>
         					</div>
-							<div class="form-group">
-								<label for="formControlRange">Délai : <input type="number" id="delayOutput" name="delay" min="0"> sec<input type="range" class="form-control-range" id="delayInput"oninput="delayOutput.value = delayInput.value" value="0" min="0" max="60"></label>
-								
-	        					<div class="form-check">
-								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
-								  <label class="form-check-label" for="defaultCheck1">
-								  	Touch pour continuer
-								  </label>
+							<div class="row">
+								<div class="col form-group">
+									<label for="formControlRange">Délai (seconde): </label>
+									<input type="number" id="delayOutput" class="form-control" name="delay" min="0">
+									<input type="range" class="form-control-range" id="delayInput"oninput="delayOutput.value = delayInput.value" value="0" min="0" max="60">
+									
+		        					<div class="form-group form-check">
+									  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
+									  <label class="form-check-label" for="defaultCheck1">
+									  	Touch pour continuer
+									  </label>
+									</div>
+									<div class="form-group form-check">
+									  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" name="adsFlag">
+									  <label class="form-check-label" for="defaultCheck2">
+									    Avertissement placement de produit
+									  </label>
+									</div>
 								</div>
-								<div class="form-check">
-								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck2" name="adsFlag">
-								  <label class="form-check-label" for="defaultCheck2">
-								    Avertissement placement de produit
-								  </label>
+								<div class="col form-group">
+										<label>Animation :</label>
+										<textarea  id="animationsEditor"></textarea>
 								</div>
 							</div>
-							<button type="submit" class="btn btn-primary">Enregistrer</button>
+							<div class="d-flex  flex-row-reverse">
+								<button type="submit" class="btn btn-primary">Enregistrer</button>
+							</div>
 		        		</form>
         			</div>
         			<div id="characterPanel" class="page characterListContainer" style="display: none;">
@@ -242,7 +253,7 @@
 							<input class="btn btn-primary" type="submit" name="configSubmit">
 			        	</form>
 			        	<div style="position: absolute;right: 5vw;bottom: 5vh;">
-		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirror.refresh();CodeMirror.setValue(editor.config.customCSS);">CSS Personalisé <i class="fas fa-file-code"></i></button>
+		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirrorCustomCSS.refresh();CodeMirrorCustomCSS.setValue(editor.config.customCSS);">CSS Personalisé <i class="fas fa-file-code"></i></button>
 		        		</div>
 			        </div>
 		        	<div id="cssPanel" class="page" style="display:none">
@@ -340,6 +351,7 @@
 	    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
 	    <!-- CodeMirror-->
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/codemirror.js" integrity="sha256-gaVop7C3WHsJH7u9FO7YwYLSLGiBGr6wTm2o3huyN24=" crossorigin="anonymous"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/javascript/javascript.js" integrity="sha256-Wyfz01iV9zeqL2igt5tF1xuVBaRZJhsd/6N9Ap/i5sU=" crossorigin="anonymous"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/css/css.js" integrity="sha256-X/teJqHXUccfWWBeziAxGjeC7jl07Gaw/FkzK78UMs0=" crossorigin="anonymous"></script>
 	    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/addon/edit/closebrackets.js" integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0=" crossorigin="anonymous"></script>
 	    <script src="https://cdn.jsdelivr.net/npm/codemirror-colorpicker@1.9.50/dist/codemirror-colorpicker.min.js" integrity="sha256-xpnjpF/9oKFV6YX0FcvYp7rk+FgsPVMD0JjB1evfpys=" crossorigin="anonymous"></script>

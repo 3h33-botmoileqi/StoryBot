@@ -100,6 +100,7 @@ class Story {
 		    while(this.id < this.conversation.length && (!this.tapeRequiredFlag || this.editor)){
 				if(this.conversation[this.id].tapeFlag && !this.editor){
 					this.tapeRequiredFlag = true;
+					$("#tapeLogo").show();
 				}else{
 					await this.waitFor(this.editor, this.editor || this.id < this.resumeId ? 0 : this.conversation[this.id].delay, ()=>{this.StoryNextMessage()});
 					//this.StoryNextMessage();
@@ -136,7 +137,14 @@ class Story {
 				this.currentMessagesGroup = this.MessageGroupDom(this.conversation[this.id].side, this.lastCharacter)
 				$(this.chatElement).append(this.currentMessagesGroup);
 			}
-			this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(this.currentMessagesGroup).children("ul"));
+			let message = this.conversation[this.id].toDOM(this.config.displayMessageDate);
+			this.insertMessageElement(message, $(this.currentMessagesGroup).children("ul"));
+			if(this.conversation[this.id].animations){
+				for(let animation of this.conversation[this.id].animations){
+					console.log(animation);
+					$(message).animate(animation.properties, animation.duration, animation.easing);
+				}
+			}
 			//$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
 			var page = $(this).attr('href'); // Page cible
 			var speed = 400; // Durée de l'animation (en ms)
@@ -306,6 +314,19 @@ class Message{
 		this.ads = ads;
 	}
 
+	AddAnimations(animArray){
+		try{
+			var json;
+			if(typeof animArray == 'string')
+				this.animations = JSON.parse(animArray);
+			else
+				this.animations = animArray;
+		}
+		catch(err){
+			console.log(err);
+		}
+	}
+
 	changeText(text){
 		this.text = text;
 	}
@@ -394,6 +415,8 @@ class Editor extends Story{
 		this.conversation = [];
 		for(let message of story.conversation){
 			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false));
+			if(message.animations)
+				this.conversation[this.conversation.length-1].AddAnimations(message.animations);
 		}
 		this.loadEditor();
 	}
@@ -684,7 +707,10 @@ class Editor extends Story{
 			msgForm["delay"].value * 1000,
 			msgForm["tapeFlag"].checked,
 			msgForm["adsFlag"].value
-			);	
+			);
+		if(CodeMirrorAnimations.getValue() !== ""){
+			message.AddAnimations(CodeMirrorAnimations.getValue());
+		}
 		if(isNew === "true"){
 			this.insertMessageEditor(id, message);	
 		}else{
@@ -713,6 +739,7 @@ class Editor extends Story{
 	LoadSelectedMessage(id, isNew = false){
 		$(".messageListContainer").hide();
 		$(".messageFormContainer").show();
+		CodeMirrorAnimations.refresh();
 
 		let msgForm = document.forms["messageForm"];
 		msgForm["messageId"].value = id;
@@ -751,6 +778,8 @@ class Editor extends Story{
 			$("#delayOutput").text(msgForm["delay"].value+" sec");
 			msgForm["tapeFlag"].checked = msg.tapeFlag;
 			msgForm["adsFlag"].checked = msg.ads;
+			if(msg.animations)
+				CodeMirrorAnimations.setValue(msg.animations ? JSON.stringify(msg.animations, null, 2) : "");
 		}
 	}
 
