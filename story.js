@@ -678,7 +678,6 @@ class Editor extends Story{
 	quickMessageFormSubmit(){
 		let msgForm = document.forms["quickMessageForm"];
 		let text = msgForm["text"].value;
-		console.log(text)
 		let message = new Message(
 			msgForm["character"].value,
 			this.characters[msgForm["character"].value].defaultSide,

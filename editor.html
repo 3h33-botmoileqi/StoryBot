@@ -253,6 +253,8 @@
 							<input class="btn btn-primary" type="submit" name="configSubmit">
 			        	</form>
 			        	<div style="position: absolute;right: 5vw;bottom: 5vh;">
+			        		<input type="file" id ="excelInput" name="excel" oninput="parseExcel(this.files[0]);" hidden>
+			        		<button class="btn btn-primary" style="margin-right: 1vw" onclick="$('#excelInput').trigger('click');">Import Excel <i class="fas fa-file-excel"></i></button>
 		        			<button class="btn btn-primary" onclick="editor.changePanel('#cssPanel');CodeMirrorCustomCSS.refresh();CodeMirrorCustomCSS.setValue(editor.config.customCSS);">CSS Personalisé <i class="fas fa-file-code"></i></button>
 		        		</div>
 			        </div>
@@ -359,6 +361,9 @@
 	    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
 	    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-auth.js"></script>
 	    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-firestore.js"></script>
+	    <!-- Excel Reader -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
+	    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
 		<script>
 		  // Initialize Firebase
 		  var config = {
