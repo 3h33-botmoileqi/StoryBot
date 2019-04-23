@@ -268,7 +268,7 @@ a.article:hover {
     left:50%;
     top:50%;
 
-    animation: heartbeat 1s ease-in-out 5s infinite both;
+    animation: heartbeat 1s ease-in-out 0.5s infinite both;
 }
 
 @keyframes heartbeat {

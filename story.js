@@ -141,7 +141,6 @@ class Story {
 			this.insertMessageElement(message, $(this.currentMessagesGroup).children("ul"));
 			if(this.conversation[this.id].animations){
 				for(let animation of this.conversation[this.id].animations){
-					console.log(animation);
 					$(message).animate(animation.properties, animation.duration, animation.easing);
 				}
 			}
