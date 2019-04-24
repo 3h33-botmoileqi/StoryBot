@@ -178,7 +178,7 @@ class Story {
     			</div>
     			<ul></ul>
 	        </li>`);
-		GroupDom.find(".messagesGroup-header").click(function(){console.log("modal open");editor.loadCharacterModal(lastCharacter)})
+		GroupDom.find(".messagesGroup-header").click(function(){editor.loadCharacterModal(lastCharacter)})
 		return GroupDom;
 	}
 
@@ -669,7 +669,7 @@ class Editor extends Story{
 					<button class="btn btn-secondary messageDown"><i class="fas fa-arrow-down"></i></button>
 				</div>
 			</li>`);
-	    $(messageItem).find('.messageView').click(function(){editor.changeViewMode("user",editor.GetIdByMessageListElement(messageItem));editor.changePanel('#chatPanel');});
+	    $(messageItem).find('.messageView').click(function(){editor.changeViewMode(true, editor.GetIdByMessageListElement(messageItem));editor.changePanel('#chatPanel');});
 	    $(messageItem).find('.messageEdit').click(function(){editor.LoadSelectedMessage(index);});
 	    $(messageItem).find('.messageDelete').click(function(){editor.DeleteMessageEditor(index)});
 	    $(messageItem).find('.messageUp').click(function(){editor.MoveSelectedMessage(editor.GetIdByMessageListElement(messageItem), -1);});
@@ -833,14 +833,18 @@ class Editor extends Story{
 		$(elementId).show();
 	}
 
-	changeViewMode(mode, resumeId = -1){//False = user / true = editor
+	changeViewMode(previsual, resumeId = -1){//False = user / true = editor
 		this.resumeId = resumeId;
 		//this.editor = mode;
-		if(mode === "editor"){
-			$("#viewMode[value=true]").prop("checked", true);
+		if(previsual === false){
+			$("#viewMode").prop("checked", false);
 			this.editor=true;
-		}else if(mode === "user"){
-			$("#viewMode[value=false]").prop("checked", true);
+			if(this.tapeRequiredFlag){
+				this.tapeRequiredFlag = false;
+				$("#tapeLogo").hide();
+			}
+		}else if(previsual === true){
+			$("#viewMode").prop("checked", true);
 			this.editor=false;
 		}
 		else{

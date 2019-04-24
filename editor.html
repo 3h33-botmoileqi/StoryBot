@@ -44,6 +44,13 @@
 	                        <svg class="svg-inline--fa fa-align-justify fa-w-14" aria-hidden="true" data-prefix="fas" data-icon="align-justify" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" data-fa-i2svg=""><path fill="currentColor" d="M0 84V44c0-8.837 7.163-16 16-16h416c8.837 0 16 7.163 16 16v40c0 8.837-7.163 16-16 16H16c-8.837 0-16-7.163-16-16zm16 144h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0 256h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16zm0-128h416c8.837 0 16-7.163 16-16v-40c0-8.837-7.163-16-16-16H16c-8.837 0-16 7.163-16 16v40c0 8.837 7.163 16 16 16z"></path></svg><!-- <i class="fas fa-align-justify"></i> -->
 	                    </button>
 	                    <div class="collapse navbar-collapse editor-toolbar" id="navbarSupportedContent" style="/*position: absolute;right: 1.7%;top: 80%;*/">
+	                    	<div class="ml-auto" style="display: inline-block;">
+	                    		<label style="vertical-align:bottom;">Prévisualisation</label>
+		                    	<label class="switch">
+								  <input id="viewMode" type="checkbox" onchange="editor.changeViewMode(this.checked);">
+								  <span class="slider round"></span>
+								</label>
+	                    	</div>
 	                    	<div class="nav ml-auto btn-group ">
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#chatPanel');editor.StartStoryEditor();"><i class="fas fa-eye"></i></button>
 		                    	<button type="button" class="btn btn-info buttonPage" onclick="editor.changePanel('#messagePanel');"><i class="fas fa-comments"></i></button>
@@ -58,10 +65,10 @@
 	            </nav>
 	            <div id="mainContent">
 	            	<div id="chatPanel" class="page" style="display: none;">
-	            		<div class="editorMode">
+	            		<!--<div class="editorMode">
 	            			Visualisation
 	            			<div class="form-check">
-							  <input id="viewMode" class="form-check-input" type="radio" name="editorMode" value="true" onchange="editor.changeViewMode('editor');" checked>
+							  <input class="form-check-input" type="radio" name="editorMode" value="true" onchange="editor.changeViewMode('editor');" checked>
 							  <label class="form-check-label">
 							    Editeur
 							  </label>
@@ -72,7 +79,7 @@
 							    Utilisateur
 							  </label>
 							</div>
-	            		</div>
+	            		</div>-->
 		            	<ul id="chat" style="/*background:grey;width:100%;height:3000px*/"></ul>
 		            	<i id="tapeLogo" class="fas fa-hand-point-up" style="display: none;"></i>
 		        	</div>
