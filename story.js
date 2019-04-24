@@ -168,7 +168,7 @@ class Story {
 	/******************* MESSAGE DOM Management**********************/
 
 	MessageGroupDom(side, lastCharacter){
-		return $(`
+		let GroupDom =  $(`
 			<li class="messagesGroup">
     			<div class="messagesGroup-header header-${side}">
     				<div>
@@ -178,6 +178,19 @@ class Story {
     			</div>
     			<ul></ul>
 	        </li>`);
+		GroupDom.find(".messagesGroup-header").click(function(){console.log("modal open");editor.loadCharacterModal(lastCharacter)})
+		return GroupDom;
+	}
+
+	loadCharacterModal(characterName){
+		$('#characterModal .avatar').attr('src', this.characters[characterName].avatar);
+		if(this.characters[characterName].video){
+			$('#characterModal #characterVideo').show();
+			$('#characterModal #characterVideo').attr('src', this.characters[characterName].video);}
+		else
+			$('#characterModal #characterVideo').hide();
+		$('#characterModal #characterName').text(characterName);
+		$('#characterModal').modal('toggle');
 	}
 
 	GetIdByMessageElement(element){
@@ -532,7 +545,8 @@ class Editor extends Story{
 		let characterNameOld = charaForm["characterName"].value;
 		let characterName = charaForm["name"].value;
 		let characterAvatar = charaForm["avatar"].value ? charaForm["avatar"].value : "https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png";
-		let character = {avatar: characterAvatar, defaultSide: charaForm["defaultSide"].value}
+		let characterVideo = charaForm["video"].value ? charaForm["video"].value : "";
+		let character = {avatar: characterAvatar, video:characterVideo, defaultSide: charaForm["defaultSide"].value}
 		if(isNew === "true"){
 			this.insertCharacterEditor(character, characterName);
 		}
@@ -601,10 +615,12 @@ class Editor extends Story{
 		let chara = this.characters[characterName];
 		charaForm["name"].value = "";
 		charaForm["avatar"].value = "";
+		charaForm["video"].value = "";
 		charaForm["defaultSide"].value = "";
 		if(!isNew){
 				charaForm["name"].value = characterName;
 				charaForm["avatar"].value = chara.avatar;
+				charaForm["video"].value = chara.video ? chara.video : "";
 				charaForm["defaultSide"].value = chara.defaultSide;
 		}
 	}

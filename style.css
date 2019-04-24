@@ -18,7 +18,7 @@ body {
 
 p {
     font-family: 'Poppins', sans-serif;
-    font-size: 1.1em;
+    font-size: 0.7em;
     font-weight: 300;
     line-height: 1.7em;
     color: #999;
@@ -296,6 +296,18 @@ a.article:hover {
   }
 }
 
+#characterWindow{
+    position:absolute;
+    left: 50%;
+    top:50%;
+    transform: translate(-50%,-50%);
+    width: 50vw;
+    height: 50vh;
+    overflow: auto;
+    padding: 17px;
+    background: whitesmoke;
+    border: 1px solid black;
+}
 .messagesGroup>ul{
     padding-inline-start: 0px;
 }
@@ -475,6 +487,7 @@ a.article:hover {
 .messagesGroup{
   animation: animateElement ease-out .75s;
   animation-iteration-count: 1;
+  margin-bottom: 5px;
 }
 
 .message{
