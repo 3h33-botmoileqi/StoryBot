@@ -515,10 +515,8 @@ a.article:hover {
 .switch {
   position: relative;
   display: inline-block;
-  width: 15vw;
-  max-width: 50px;
-  height: 5vh;
-  max-height: 28px;
+  width: 50px;
+  height: 28px;
 }
 
 /* Hide default HTML checkbox */
@@ -544,10 +542,8 @@ a.article:hover {
 .slider:before {
   position: absolute;
   content: "";
-  height: 4vmax;
-  max-height: 20px;
-  width: 4vmax;
-  max-width: 20px;
+  height: 20px;
+  width: 20px;
   left: 4px;
   bottom: 4px;
   background-color: white;
