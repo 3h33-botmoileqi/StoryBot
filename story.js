@@ -98,7 +98,7 @@ class Story {
 		if(this.conversation.length){
 			this.generateMessagesGroup();
 		    while(this.id < this.conversation.length && (!this.tapeRequiredFlag || this.editor)){
-				if(this.conversation[this.id].tapeFlag && !this.editor){
+				if(this.conversation[this.id].tapeFlag && !this.editor && this.id >= this.resumeId){
 					this.tapeRequiredFlag = true;
 					$("#tapeLogo").show();
 				}else{
