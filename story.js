@@ -103,22 +103,6 @@ class Story {
 					$("#tapeLogo").show();
 				}else{
 					await this.waitFor(this.editor, this.editor || this.id < this.resumeId ? 0 : this.conversation[this.id].delay, ()=>{this.StoryNextMessage()});
-					//this.StoryNextMessage();
-					//this.insertChat(array[this.state.displayStory.length], true)
-					//chatElement.append(this.conversation[this.id].output());
-					//console.log(this.id);
-					/*console.log(this.currentMessagesGroup)
-					if(this.currentMessagesGroup == null || this.conversation[this.id].character !== this.lastCharacter){
-						this.lastCharacter = this.conversation[this.id].character;
-						this.currentMessagesGroup = this.MessageGroupDom(this.conversation[this.id].side, this.lastCharacter)
-						$(this.chatElement).append(this.currentMessagesGroup);
-					}
-					this.insertMessageElement($(this.conversation[this.id].toDOM(this.config.displayMessageDate)), $(this.currentMessagesGroup).children("ul"));
-					//$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
-					var page = $(this).attr('href'); // Page cible
-					var speed = 400; // Durée de l'animation (en ms)
-					$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
-					this.id++;*/
 				}
 		    }
 		}
@@ -189,6 +173,11 @@ class Story {
 			$('#characterModal #characterVideo').attr('src', this.characters[characterName].video);}
 		else
 			$('#characterModal #characterVideo').hide();
+		if(this.characters[characterName].description){
+			$('#characterModal #description').text(this.characters[characterName].description);
+		}else{
+			$('#characterModal #description').text("");
+		}
 		$('#characterModal #characterName').text(characterName);
 		$('#characterModal').modal('toggle');
 	}
@@ -546,7 +535,8 @@ class Editor extends Story{
 		let characterName = charaForm["name"].value;
 		let characterAvatar = charaForm["avatar"].value ? charaForm["avatar"].value : "https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png";
 		let characterVideo = charaForm["video"].value ? charaForm["video"].value : "";
-		let character = {avatar: characterAvatar, video:characterVideo, defaultSide: charaForm["defaultSide"].value}
+		let charDesc = $(quillCharDesc.root.innerHTML).html() ? $(quillCharDesc.root.innerHTML).html() : ""
+		let character = {avatar: characterAvatar, video:characterVideo, description:charDesc, defaultSide: charaForm["defaultSide"].value}
 		if(isNew === "true"){
 			this.insertCharacterEditor(character, characterName);
 		}
@@ -616,11 +606,13 @@ class Editor extends Story{
 		charaForm["name"].value = "";
 		charaForm["avatar"].value = "";
 		charaForm["video"].value = "";
+		quillCharDesc.root.innerHTML = "";
 		charaForm["defaultSide"].value = "";
 		if(!isNew){
 				charaForm["name"].value = characterName;
 				charaForm["avatar"].value = chara.avatar;
 				charaForm["video"].value = chara.video ? chara.video : "";
+				quillCharDesc.root.innerHTML = chara.description;
 				charaForm["defaultSide"].value = chara.defaultSide;
 		}
 	}

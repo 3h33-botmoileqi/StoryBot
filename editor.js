@@ -21,6 +21,10 @@ var quill = new Quill('#message-editor', {
 	theme: 'snow'
 });
 
+var quillCharDesc = new Quill('#charDesc-editor', {
+    theme: 'snow'
+});
+
 $(function () {
 	$('#datetimepicker1').datetimepicker({date:new Date, locale: 'fr', icons:{time:"fa fa-clock", date:"fa fa-calendar-alt"}});
 });

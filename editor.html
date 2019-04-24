@@ -102,28 +102,32 @@
 		        				<select class="form-control characterList" name="character" onchange="document.forms['messageForm']['side'].value = editor.characters[this.value].defaultSide" required style="max-width: 50vw"></select>
         						<button class="btn-dark" onclick="editor.LoadSelectedCharacter(null, true);return false;"><i class="fas fa-plus"></i></button>
 		        			</div>
-        					<div class="form-group">
-	        					<label>Coté du chat :</label>
-	        					<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="side" value="left">
-								  <label class="form-check-label" for="inlineRadio1">Gauche</label>
+        					<div class="form-group row">
+        						<div class="col">
+		        					<label>Coté du chat :</label>
+		        					<div class="form-check form-check-inline">
+									  <input class="form-check-input" type="radio" name="side" value="left">
+									  <label class="form-check-label" for="inlineRadio1">Gauche</label>
+									</div>
+									<div class="form-check form-check-inline">
+									  <input class="form-check-input" type="radio" name="side" value="right">
+									  <label class="form-check-label" for="inlineRadio2">Droit</label>
+									</div>
 								</div>
-								<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="side" value="right">
-								  <label class="form-check-label" for="inlineRadio2">Droit</label>
-								</div>
-	        					<label>Contenu :</label>
-	        					<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="content" value="text" onclick="$('#mediaPayload').hide();$('#textPayload').show()">
-								  <label class="form-check-label" for="inlineRadio1">Texte</label>
-								</div>
-								<div class="form-check form-check-inline">
-								  <input class="form-check-input" type="radio" name="content" value="media" onclick="$('#mediaPayload').show();$('#textPayload').hide()">
-								  <label class="form-check-label" for="inlineRadio2">Media</label>
+								<div class="col">
+		        					<label>Contenu :</label>
+		        					<div class="form-check form-check-inline">
+									  <input class="form-check-input" type="radio" name="content" value="text" onclick="$('#mediaPayload').hide();$('#textPayload').show()">
+									  <label class="form-check-label" for="inlineRadio1">Texte</label>
+									</div>
+									<div class="form-check form-check-inline">
+									  <input class="form-check-input" type="radio" name="content" value="media" onclick="$('#mediaPayload').show();$('#textPayload').hide()">
+									  <label class="form-check-label" for="inlineRadio2">Media</label>
+									</div>
 								</div>
 							</div>
 							<div id="textPayload" class="form-group">
-        						<div id="message-Editor" class="form-control" style="height: 25%"></div>
+        						<div id="message-Editor" class="form-control" style="height: 25vh"></div>
         					</div>
         					<div id="mediaPayload" class="form-group" style="display: none">
 	        					<label>Type :</label>
@@ -204,12 +208,16 @@
 	        					<label>Video :</label>
 	        					<input type="text" name="video" class="form-control" >
 							</div>
+							<div id="textPayload" class="form-group">
+        						<div id="charDesc-editor" class="form-control" style="height: 25vh"></div>
+        					</div>
         					<div class="form-group">
 	        					<label>Coté du chat :</label>
 	        					<div class="form-check form-check-inline">
 								  <input class="form-check-input" type="radio" name="defaultSide" value="left" required>
 								  <label class="form-check-label" for="inlineRadio1">Gauche</label>
 								</div>
+								<label>
 								<div class="form-check form-check-inline">
 								  <input class="form-check-input" type="radio" name="defaultSide" value="right" required>
 								  <label class="form-check-label" for="inlineRadio2">Droit</label>
@@ -347,9 +355,9 @@
 	    					<h6 id="characterName"></h6>
 	    				</div>
     				</div>
-			    	<div class="d-flex flex-row justify-content-between"><h5>Description</h5><h5>Humeur Actuel : Joviale</h5></div>
+    				<br/>
 			    	<div>
-			    		<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			    		<p id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 			    	</div>
 			    	<div style="text-align: center;">
 			    		<video id="characterVideo" controls autoplay muted src="https://app.coverr.co/s3/mp4/Road-Tripping.mp4" style="width: 25vw">
