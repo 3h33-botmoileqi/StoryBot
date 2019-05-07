@@ -62,6 +62,13 @@ a:focus {
   }
 }
 
+.navbar{
+  -moz-box-shadow: 0px 0px 4px 0px #656565;
+  -webkit-box-shadow: 0px 0px 4px 0px #656565;
+  -o-box-shadow: 0px 0px 4px 0px #656565;
+  box-shadow: 0px 0px 4px 0px #656565;
+}
+
 .navbar-return{
     border: 0px solid transparent;
     border-radius: 50%;
