@@ -72,7 +72,7 @@ function loadStories(login){
                 <li id="${doc.id}" class="list-group-item d-flex align-items-center story">
                     <div class="flex-grow-1 text">${doc.data().name}</div>
                     <div>
-                        <a href="/editor?id=${doc.id}"><button class="btn btn-secondary storyLoad"><i class="fas fa-edit" style="color:white"></i></button></a>
+                        <a href="editor?id=${doc.id}"><button class="btn btn-secondary storyLoad"><i class="fas fa-edit" style="color:white"></i></button></a>
                         <button class="btn btn-secondary storyDelete" onclick="deleteStory('${doc.id}')"><i class="fas fa-times"></i></button>
                     </div>
                 </li>`);
