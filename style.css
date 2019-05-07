@@ -32,15 +32,46 @@ a:focus {
     transition: all 0.3s;
 }
 
-.navbar {
+/* .navbar {
     padding: 15px 10px;
     background: #fff;
     border: none;
     border-radius: 0;
     height: 8vh;
-    /* margin-bottom: 40px; */
+    margin-bottom: 40px;
     box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
+} */
+
+
+.navbar-separator{
+  height: 0;
+  border-width: 0 0 0 0;
 }
+@media (min-width: 992px) {
+  .navbar-separator{
+    width: 0px;
+    height: 20px;
+    margin: auto 0;
+    border-style: solid;
+    border-width: 0px 1px 0px 0px;
+    border-top-width: 0px;
+    border-right-width: 1px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-color: #616161;
+  }
+}
+
+.navbar-return{
+    border: 0px solid transparent;
+    border-radius: 50%;
+    margin-right: 20px;
+    padding: 7px 10px;
+}
+.navbar-return:hover{
+  background: #ff6969;
+}
+
 
 .navbar-btn {
     box-shadow: none;
@@ -84,6 +115,7 @@ a:focus {
 #sidebar .sidebar-header {
     padding: 5px;
     background: #6d7fcc;
+    border-bottom: 1px solid #47748b;
 }
 
 #sidebar ul.components {
@@ -248,7 +280,7 @@ a.article:hover {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
-#chatPanel::-webkit-scrollbar { 
+#chatPanel::-webkit-scrollbar {
     display: none;
 }
 
@@ -259,6 +291,7 @@ a.article:hover {
     list-style-type: none;
     /* overflow: auto; */
     padding-inline-start: 0px;
+    -webkit-padding-start: 0px;
     /* min-height: 90vh; */
     margin: 0;
 }
@@ -416,16 +449,19 @@ a.article:hover {
     MessageList
 --------------------------------------------------*/
 .messageListContainer{
-    width: 100%
+    width: 100%;
 }
 
 #messageList {
     overflow: auto;
-    max-height: 85%;
+    max-height: 92%;
+}
+#messageList::-webkit-scrollbar {
+    display: none;
 }
 
 #messageList .tools {
-    min-width: 160px;
+    min-width: 200px;
 }
 
 #messageList .list-group-item{
@@ -438,6 +474,9 @@ a.article:hover {
     max-width: 68vw;
 }
 
+#editableQuickText{
+  outline: -webkit-focus-ring-color auto 5px;
+}
 /*-----------------------------------------
     MessageForm
 ------------------------------------------*/
@@ -508,10 +547,72 @@ a.article:hover {
 /* ---------------------------------------------------
     Navbar component
 ------------------------------------------------------ */
-.navbar-collapse{
-    background: whitesmoke;
+.editor-toolbar>.btn-group{
+    margin-left: 10px;
 }
+.editor-toolbar>.btn{
+    margin-left: 10px;
+}
+
+.container-fluid .btn{
+    width: 3.5rem;
+    font-size: 1.5rem;
+}
+
+
+/*.show{
+  display: block;
+  position: absolute;
+  right: 3.5rem;
+  top: 0.9rem;
+}*/
+/*
+.horizontal{
+  width: auto;
+}
+*/
+/* @media (max-width: 992px){
+  .editor-toolbar.show, .editor-toolbar.collapsing{
+    position: absolute;
+    right: 75px;
+    top: 15px;
+  }
+}
+.collapse.show {
+  visibility: visible;
+}
+.collapsing {
+  visibility: visible;
+  height: 0;
+  -webkit-transition-property: height, visibility;
+  transition-property: height, visibility;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+.collapsing.width {
+  -webkit-transition-property: width, visibility;
+  transition-property: width, visibility;
+  width: 0;
+  height: 100%;
+  -webkit-transition-timing-function: ease-out;
+  transition-timing-function: ease-out;
+}
+
+.editor-toolbar{
+  display: flex;
+  flex-basis: auto;
+} */
+
 /* The switch - the box around the slider */
+#switchPreview{
+display: inline-flex;
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+}
+#switchPreview label{
+  margin-bottom: 0;
+}
 .switch {
   position: relative;
   display: inline-block;
