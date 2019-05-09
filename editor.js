@@ -15,18 +15,10 @@ class Editor extends Story{
 	}
 
 	//load story from DB
-	loadStory(ref, story){
+	loadStoryEditor(ref, story){
 		this.storyRef = ref;
 		this.authors = story.authors;
-		this.name = story.name;
-		this.config = story.config;
-		this.characters = story.characters;
-		this.conversation = [];
-		for(let message of story.conversation){
-			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false));
-			if(message.animations)
-				this.conversation[this.conversation.length-1].AddAnimations(message.animations);
-		}
+		this.loadStory(story);
 		if(this.editor)
 			this.loadEditor();
 	}
@@ -409,11 +401,12 @@ class Editor extends Story{
 	configFormSubmit(){
 		let configForm = document.forms["configForm"];
 		this.name = configForm['storyName'].value;
-		this.config.displaycharacterName = configForm['displaycharacterName'].checked
-		this.config.displaycharacterAvatar = configForm['displaycharacterAvatar'].checked
-		this.config.displayMessageDate = configForm['displayMessageDate'].checked
+		this.config.isPublished = configForm['isPublish'].checked;
+		this.config.displaycharacterName = configForm['displaycharacterName'].checked;
+		this.config.displaycharacterAvatar = configForm['displaycharacterAvatar'].checked;
+		this.config.displayMessageDate = configForm['displayMessageDate'].checked;
 		if(configForm['adsFlag'].value == true)
-			this.config.adsEachMessage = configForm['adsEachMessages'].value
+			this.config.adsEachMessage = configForm['adsEachMessages'].value;
 		else
 			this.config.adsEachMessage = 0;
 	}
@@ -421,6 +414,7 @@ class Editor extends Story{
 	loadConfig(){
 		let configForm = document.forms["configForm"];
 		configForm['storyName'].value = this.name;
+		configForm['isPublish'].checked = this.config.isPublished;
 		configForm['displaycharacterName'].checked = this.config.displaycharacterName;
 		configForm['displaycharacterAvatar'].checked = this.config.displaycharacterAvatar;
 		configForm['displayMessageDate'].checked = this.config.displayMessageDate;

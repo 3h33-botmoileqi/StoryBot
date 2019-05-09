@@ -1,12 +1,13 @@
 class Story {
 	constructor(chatElement){
-		this.name = "New Story"
+		this.name = "New Story";
 		this.config = {
+			"isPublished": false,
 			"adsEachMessages": -1,
 			"displaycharacterName":true,
 			"displaycharacterAvatar":true,
 			"displayMessageDate":true,
-			"customCSS":""
+			"customCSS":"",
 		};
 		this.characters = {};
 		this.conversation = [];
@@ -76,6 +77,18 @@ class Story {
 	contructor(story, chatElement){
 
 		generateMessagesGroup();
+	}
+
+	loadStory(story){
+		this.name = story.name;
+		this.config = story.config;
+		this.characters = story.characters;
+		this.conversation = [];
+		for(let message of story.conversation){
+			this.conversation.push(new Message(message.character, message.side, message.text, message.payload, message.timestamp, message.delay, message.tapeFlag, false));
+			if(message.animations)
+				this.conversation[this.conversation.length-1].AddAnimations(message.animations);
+		}
 	}
 
 	log(){

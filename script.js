@@ -82,7 +82,7 @@ $(document).ready(function () {
 // }
 
 function loadStory(doc){
-  editor.loadStory(doc.id, doc.data());
+  editor.loadStoryEditor(doc.id, doc.data());
   $(".navbar-brand").text(editor.name);
   //link css editor with custom css
   if(editor.config['customCSS'])
@@ -145,6 +145,8 @@ function ConfirmDialog(title, message, callback) {
     });
 };
 
+//## region ExcelExport
+
 function ImportExcel(title, message, callback) {
     $('<div></div>').appendTo('body')
     .html('<div><h6>'+message+'</h6></div>')
@@ -189,8 +191,6 @@ function ImportExcel(title, message, callback) {
     });
 };
 
-
-/****************************************/
 let parseExcel = function(file) {
     var reader = new FileReader();
 
@@ -267,20 +267,7 @@ let parseExcel = function(file) {
 
     reader.readAsBinaryString(file);
 };
-
-function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    location.search
-        .substr(1)
-        .split("&")
-        .forEach(function (item) {
-          tmp = item.split("=");
-          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-        });
-    return result;
-}
-/****************************************/
+//## endregion
 
 //## region dropzone
 
@@ -297,7 +284,7 @@ var MessageContentDropzone = new Dropzone("#MessageDropzone", { // Make the whol
   maxFiles:1,
   maxFilesize:25,
   acceptedFiles: "image/*,video/*,audio/*",
-  dictDefaultMessage:"Déplacer votre media ici",
+  dictDefaultMessage:"Déplacer ou cliquer ici pour mettre en ligne vos fichiers",
   dictInvalidFileType: "Ce fichier n'est pas au bon format",
   dictFileTooBig: "Votre fichier ne dois pas dépasser {{maxFilesize}} Mo (fichier actuel = {{filesize}} Mo)."
 });
@@ -346,7 +333,7 @@ MessageContentDropzone.on("removedfile", function(file){
     acceptedFiles: "image/*",
     resizeWidth:48,
     resizeHeight:48,
-    dictDefaultMessage:"Déplacer votre avatar ici",
+    dictDefaultMessage:"Déplacer ou cliquer ici pour mettre en ligne vos fichiers",
     dictInvalidFileType: "Ce fichier n'est pas au bon format",
     dictFileTooBig: "Votre fichier ne dois pas dépasser {{maxFilesize}} Mo (fichier actuel = {{filesize}} Mo)."
   });

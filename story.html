@@ -1,0 +1,99 @@
+<html class="fontawesome-i2svg-active fontawesome-i2svg-complete">
+	<head>
+	    <meta charset="utf-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+	    <title>StoryBot</title>
+	    <!-- Bootstrap CSS CDN -->
+	    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+	    <!-- jQuery UI -->
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" integrity="sha256-p6xU9YulB7E2Ic62/PX+h59ayb3PBJ0WFTEQxq0EjHw=" crossorigin="anonymous" />
+	    <!-- Our Custom CSS -->
+	    <link rel="stylesheet" href="style.css">
+	    <!-- Quill CSS -->
+	    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+	    <!-- Tempus Dominus css -->
+	    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.0-alpha14/css/tempusdominus-bootstrap-4.min.css" />
+	   <!-- Firebase -->
+			<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
+	</head>
+	<body data-__gyazo-extension-added-paste-support="true">
+	  <div id="content">
+      <nav class="navbar navbar-expand-lg sticky-top navbar-light bg-light">
+				<a class="navbar-return" href="./"><i class="fas fa-chevron-left"></i></a>
+      </nav>
+      <div id="mainContent">
+      	<div id="chatPanel" class="page" style="display: none;">
+        	<ul id="chat" style="/*background:grey;width:100%;height:3000px*/"></ul>
+        	<i id="tapeLogo" class="fas fa-hand-point-up" style="display: none;"></i>
+    		</div>
+      </div>
+    </div>
+    <div  id="characterModal" class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
+		  <div class="modal-dialog modal-lg">
+		    <div class="modal-content">
+		    	<div style="padding: 20px">
+			    	<div class="messagesGroup-header header-left">
+	    				<div>
+	    					<img class="avatar" src=""/>
+	    					<h6 id="characterName"></h6>
+	    				</div>
+    				</div>
+    				<br/>
+			    	<div>
+			    		<p id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+			    	</div>
+			    	<div style="text-align: center;">
+			    		<video id="characterVideo" controls autoplay muted src="https://app.coverr.co/s3/mp4/Road-Tripping.mp4" style="width: 25vw">
+			    			Your browser does not support the video tag.
+			    		</video>
+			    	</div>
+		    	</div>
+		    </div>
+		  </div>
+		</div>
+    <!-- jQuery CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+    <!-- jQuery UI -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <!-- Popper.JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <!-- Font Awesome JS -->
+    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
+    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-firestore.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase-storage.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/ui/3.6.0/firebase-ui-auth__fr.js"></script>
+    <script src="commun.js"></script>
+    <script src="message.js"></script>
+    <script src="story.js"></script>
+    <script type="text/javascript">
+      let story = new Story();
+      $(document).ready(function (){
+        firebase.auth().onAuthStateChanged(function(user) {
+          id = findGetParameter("id");
+          if (user && id != null) {
+            // $(".editor-toolbar").collapse();
+            db.collection('stories').doc(id).get().then((doc) => {
+              if(doc.exists){
+                story.loadStory(doc.data());
+                changePanel("#chatPanel");
+                story.playStory();
+              }else{
+                window.location.replace(window.location.origin);
+              }
+            })
+          } else {
+            // No user is signed in.
+            window.location.replace(window.location.origin);
+          }
+        });
+      });
+    </script>
+	</body>
+</html>

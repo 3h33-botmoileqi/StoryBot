@@ -11,7 +11,7 @@ $(document).ready(function () {
   //   document.documentElement.style.setProperty('--vh', `${vh}px`);
   // });
   $('#chatPanel').click(function(){
-    if(editor){
+    if(typeof editor !== 'undefined'){
       if(editor.tapeRequiredFlag)
         editor.StoryNextMessage(true);
     }else{
@@ -43,6 +43,20 @@ function changePanel(elementId){
   }
   $('.page').hide();
   $(elementId).show();
+  $('.navbar-collapse.show').removeClass("show");
+}
+//Get URL parameter
+function findGetParameter(parameterName) {
+    var result = null,
+        tmp = [];
+    location.search
+        .substr(1)
+        .split("&")
+        .forEach(function (item) {
+          tmp = item.split("=");
+          if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
+        });
+    return result;
 }
 
 //## region DeleteStory

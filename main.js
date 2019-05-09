@@ -34,7 +34,7 @@ $(document).ready(function (){
     // Privacy policy url.
     privacyPolicyUrl: '<your-privacy-policy-url>'
   };
-
+  loadPublishedStory();
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
@@ -115,5 +115,31 @@ function createNewStory(){
   })
   .catch(err => {
       console.log('Error adding document', err);
+  })
+}
+
+var storiesPerRow = 4;//Must be X % 2 = 0
+var gridSize = 12 / storiesPerRow;
+function loadPublishedStory(){
+  db.collection("stories").where("config.isPublished", "==", true).get().then(querySnapshot => {
+    if(querySnapshot.empty){
+      console.log("aucun stories disponible");
+    }else{
+      var i = 0;
+      var library = $('<div class="storyList"></div>');
+      console.log((i < querySnapshot.docs.length));
+      for (var y = 0; i < 16 ; y++) {
+        var row = $('<div class="row"></div>');
+        for (var x = 0; x < storiesPerRow && i < 24; x++) {
+          //var doc = querySnapshot.docs[i].data();
+          var card = $(`<div class="storyCard col-lg-${gridSize}"><img src="https://via.placeholder.com/${parseInt(($("#content").width()-50)/storiesPerRow)}x200"><h5>${"Placeholder"}</h5></div>`);
+          card.click(function(){window.location.replace("/story?id=k0MlF1wZlPP8ewu2EEDb")});
+          $(row).append(card);
+          i++;
+        }
+        $(library).append(row);
+      }
+      $("#storePage").append(library);
+    }
   })
 }
