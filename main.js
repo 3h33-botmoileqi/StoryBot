@@ -133,7 +133,7 @@ function loadPublishedStory(){
         for (var x = 0; x < storiesPerRow && i < 24; x++) {
           //var doc = querySnapshot.docs[i].data();
           var card = $(`<div class="storyCard col-lg-${gridSize}"><img src="https://via.placeholder.com/${parseInt(($("#content").width()-50)/storiesPerRow)}x200"><h5>${"Placeholder"}</h5></div>`);
-          card.click(function(){window.location.replace("/story?id=k0MlF1wZlPP8ewu2EEDb")});
+          card.click(function(){window.location.replace("./story?id=k0MlF1wZlPP8ewu2EEDb")});
           $(row).append(card);
           i++;
         }
