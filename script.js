@@ -47,8 +47,14 @@ $(document).ready(function () {
         // $(".editor-toolbar").collapse();
         db.collection('stories').doc(id).get().then((doc) => {
           if(doc.exists){
-            loadStory(doc);
+            if(doc.data().authors.findIndex(ref => ref === user.uid) != -1)
+              loadStory(doc);
+            else{
+              alert("Vous ne disposez pas d'accès d'auteur pour cette story");
+              window.location.replace(window.location.origin);
+            }
           }else{
+            alert("Story Introuvable");
             window.location.replace(window.location.origin);
           }
         })
@@ -96,54 +102,52 @@ function loadStory(doc){
 }
 
 function saveStory(callback = null){
-        db.collection("stories").doc(id).get().then(doc => {
-          doc.ref.update({
-              name: editor.name,
-              config: editor.config,
-              characters: editor.characters,
-              conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
-          })
-          localStorage["lastStory"] = doc.id;
-          if(callback != null){
-              callback();
-          }
-        })
-        .catch(err => {
-            console.log('Error updating document '+editor.storyRef, err);
-        });
+  db.collection("stories").doc(id).get().then(doc => {
+    doc.ref.update({
+        name: editor.name,
+        config: editor.config,
+        characters: editor.characters,
+        conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
+    })
+    localStorage["lastStory"] = doc.id;
+    if(callback != null){
+        callback();
     }
+  })
+  .catch(err => {
+      console.log('Error updating document '+editor.storyRef, err);
+  });
+}
 
-/**************************************************************/
-
-function ConfirmDialog(title, message, callback) {
-    $('<div></div>').appendTo('body')
-    .html('<div><h6>'+message+'</h6></div>')
-    .dialog({
-        modal: false, title: title, zIndex: 10000, autoOpen: true,
-        width: 'auto', resizable: false,
-        buttons: {
-            Oui: {
-                click:function () {
-                    $(this).dialog("close");
-                    callback(true)
-                },
-                text: "Oui",
-                class: 'btn btn-success'
-            },
-            Non: {
-                click:function () {
-                    $(this).dialog("close");
-                    callback(false)
-                },
-                text:"Non",
-                class: 'btn btn-danger'
-            }
-        },
-        close: function (event, ui) {
-            $(this).remove();
-        }
-    });
-};
+// function ConfirmDialog(title, message, callback) {
+//     $('<div></div>').appendTo('body')
+//     .html('<div><h6>'+message+'</h6></div>')
+//     .dialog({
+//         modal: false, title: title, zIndex: 10000, autoOpen: true,
+//         width: 'auto', resizable: false,
+//         buttons: {
+//             Oui: {
+//                 click:function () {
+//                     $(this).dialog("close");
+//                     callback(true)
+//                 },
+//                 text: "Oui",
+//                 class: 'btn btn-success'
+//             },
+//             Non: {
+//                 click:function () {
+//                     $(this).dialog("close");
+//                     callback(false)
+//                 },
+//                 text:"Non",
+//                 class: 'btn btn-danger'
+//             }
+//         },
+//         close: function (event, ui) {
+//             $(this).remove();
+//         }
+//     });
+// };
 
 //## region ExcelExport
 
@@ -207,12 +211,13 @@ let parseExcel = function(file) {
             //Chars
             if(workbook.Sheets["characters"]){
                 var characters = XLSX.utils.sheet_to_row_object_array(workbook.Sheets["characters"]);
+                var i =0;
                 for(let row of characters){
                     if(row.name){
                         let character = {
                             avatar: row.avatar ? row.avatar : "https://cdn.iconscout.com/icon/free/png-256/avatar-380-456332.png",
                             video: row.video ? row.video : "",
-                            defaultSide : row.side ? row.side : "left"
+                              defaultSide : row.side ? row.side : (i % 2 === 0 ? "left" : "right")
                         }
                         if(!editor.characters[row.name]){
                             editor.insertCharacterEditor(character, row.name);
@@ -221,6 +226,7 @@ let parseExcel = function(file) {
                             editor.characters[row.character] = character;
                         }
                     }
+                    i++;
                 }
             }
             //Conv
