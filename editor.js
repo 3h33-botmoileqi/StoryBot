@@ -1,4 +1,9 @@
 class Editor extends Story{
+	/**
+	* @property {Bool} editor défini la méthode d'affichage de la story par défaut true (false = user / true = editor)
+	* @property {String} storyRef clé de la story pour la base de donnéelse
+	* @property {Array<string>} authors Liste des uid des auteurs ayant accès a la story
+	*/
 	constructor(){
 		super();
 		this.editor = true;
@@ -6,56 +11,72 @@ class Editor extends Story{
 		this.authors = [];
 		this.loadEditor();
 	}
-
-	//Start Story
+//## region Load & save
+	//débute la lecture de la story
 	StartStoryEditor(){
 		$("#chat").empty();
 		this.tapeRequiredFlag = false;
 		this.playStory();
 	}
 
-	//load story from DB
-	loadStoryEditor(ref, story){
-		this.storyRef = ref;
+	//Charge une story provenant d'une base de donnée
+	loadStoryEditor(id, story){
+		this.storyRef = id;
 		this.authors = story.authors;
 		this.loadStory(story);
 		if(this.editor)
 			this.loadEditor();
 	}
 
-	//Load editor (messages/Character)
+	//charge les données de la story message / character / author dans l'éditeur
 	loadEditor(){
 		this.loadAuthors();
 		this.loadMessages();
 		this.loadCharacters();
 	}
+//## endregion
 
 //## region Authors
-	authorItemDom(author, id){
-		var authorItem = $(`
+
+	/**
+	* crée l'element HTML correspondant a un auteurs & y attache les evènement neccéssaire a la gestion
+	* @param {string} author - email de l'auteur
+	* @param {string} uid - uid de l'auteur
+	* @return {object} Jquery Element de l'auteur généré
+	*/
+	authorDOMElement(author, uid){
+		var authorElement = $(`
 			<li class="list-group-item d-flex align-items-center author">
 				<div class="flex-grow-1 text">${author}</div>
 				<button class="btn btn-secondary authorDelete"><i class="fas fa-times"></i></button>
 			</li>`);
-	    $(authorItem).find('.authorDelete').click(function(){editor.DeleteAuthor(id)});
-		return authorItem;
+	    $(authorElement).find('.authorDelete').click(function(){editor.DeleteAuthor(uid)});
+		return authorElement;
 	}
 
+	/**
+	* Boucle de création de la liste des auteurs
+	*/
 	loadAuthors(){
 		$("#authorsList").empty();
 		for(var author of this.authors){
 			db.collection("users").doc(author).get().then(doc =>{
-				let authorItem = this.authorItemDom(doc.data().email, doc.id);
-				$("#authorsList").append(authorItem);
+				$("#authorsList").append(this.authorDOMElement(doc.data().email, doc.id));
 			})
 		}
 	}
-
+	/**
+	* Check la validité d'un mail
+	*/
 	validateEmail(email) {
 	    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 	    return re.test(String(email).toLowerCase());
 	}
 
+	/**
+	* Ajoute un nouvelle auteur a la story
+	* @param {String} author - email du nouvelle auteur
+	*/
 	AddAuthor(author){
 	if(this.validateEmail(author)){
 		db.collection('users').where("email", "==", author).get().then(snapshot => {
@@ -86,9 +107,13 @@ class Editor extends Story{
 	}
 }
 
-	DeleteAuthor(authorId){
-		if(firebase.auth().currentUser.uid != authorId){
-			let id = this.authors.findIndex(ref => ref	 === authorId);
+	/**
+	* Supprime l'accès d'un auteur à la story
+	* @param {String} uid - uid de l'auteur perdant l'accès
+	*/
+	DeleteAuthor(uid){
+		if(firebase.auth().currentUser.uid != uid){
+			let id = this.authors.findIndex(ref => ref	 === uid);
 			this.authors.splice(id, 1);
 			$(`.author:nth-child(${id+1})`).remove();
 			db.collection("stories").doc(this.storyRef).update({
@@ -101,14 +126,16 @@ class Editor extends Story{
 //## endregion
 
 //## region Characters
+	/**
+	* Chargement par l'editeur des personnages de la Story
+	*/
 	loadCharacters(){
 		var editorRef = this;
 		 $(".characterList").each(function(indexList, list){
 			$(list).empty();
 			$.each(editorRef.characters,function(characterName, character){
 				if($(list).is("#mainCharacterList")){
-					let characterItem = editorRef.characterItemDom(characterName);
-					$(list).append(characterItem);
+					$(list).append(editorRef.characterItemDom(characterName));
 				}else{
 					$(list).append(`<option value="${characterName}">${characterName}</option>`);
 				}
@@ -116,6 +143,11 @@ class Editor extends Story{
 		})
 	}
 
+	/**
+	* crée l'element HTML correspondant a un personnage & y attache les evènement neccéssaire a la gestion
+	* @param {string} characterName - nom du personnage
+	* @return {object} Jquery Element du personnage généré
+	*/
 	characterItemDom(characterName){
 		let characterItem = $(
 			`<li id="character-${characterName}" class="list-group-item d-flex align-items-center">
@@ -130,7 +162,9 @@ class Editor extends Story{
 	    $(characterItem).find('.characterDelete').click(function(){editor.DeleteCharacterEditor(characterName)});
 	    return characterItem;
 	}
-
+	/**
+	* Reception du formulaire de Personnage
+	*/
 	characterFormSubmit(){
 		let charaForm = document.forms["characterForm"];
 		let isNew = charaForm["isNew"].value;
@@ -150,11 +184,22 @@ class Editor extends Story{
 		$(".characterListContainer").show();
 	}
 
+	/**
+	* Rajoute a la story un nouveau personnage
+	* @param {Object} character - informations concernant le personnage
+	* @param {String} characterName - nom du personnage
+	*/
 	insertCharacterEditor(character, characterName){
 		this.characters[characterName] = character;
 		this.loadCharacters();
 	}
 
+	/**
+	* Edition des informations d'un personnage de la storyRef
+	* @param {Object} character - informations concernant le personnage
+	* @param {String} characterName - nouveau nom du personnage
+	* @param {String} characterNameOld - ancien nom du personnage
+	*/
 	editCharacterEditor(character, characterName, characterNameOld){
 		if(characterName !== characterNameOld){
 			this.DeleteCharacter(characterNameOld);
@@ -178,6 +223,10 @@ class Editor extends Story{
 		});
 	}
 
+	/**
+	* Suppression d'un personnage de la story
+	* @param {String} characterName - nouveau nom du personnage
+	*/
 	DeleteCharacterEditor(characterName){
 		for (var i = 0; i <this.conversation.length ; i++) {
 			if(this.conversation[i].character == characterName){
@@ -198,6 +247,11 @@ class Editor extends Story{
 		});
 	}
 
+	/**
+	* Chargement des informations concernant un personnage dans le formulaire des Personnage
+	* @param {String} characterName - nouveau nom du personnage
+	* @param {Bool} isNew - Flag pour un nouveau Personnage par défaut il n'est pas un nouveau
+	*/
 	LoadSelectedCharacter(characterName, isNew = false){
 		$(".page").hide();
 		$(".characterFormContainer").show();
@@ -222,6 +276,12 @@ class Editor extends Story{
 //## endregion
 
 //## region Messages
+
+
+	/**
+	* Chargement par l'editeur des messages de la Story
+	* Ajoute un formulaire pour l'ajout de message rapide a la fin de la liste de message
+	*/
 	loadMessages(){
 		$("#messageList").empty();
 		for (var i = 0; i < this.conversation.length; i++) {
@@ -240,19 +300,37 @@ class Editor extends Story{
 		$("#messageList").append(quickMessageForm);
 		this.MessagelistScrollDown();
 	}
-
+	/**
+	* Déclenche le Scroll automatique pour atteindre le bas de la liste des messages
+	*/
 	MessagelistScrollDown(){
 		$("#messageList").animate( { width: "ease-out",scrollTop: $("#messageList").prop('scrollHeight') }, 750 ); // Go
 	}
 
+	/**
+	* Récupère l'id d'un message a partir de son element html
+	* @param {Object} element - Jquery Element du message
+	* @return {Number} index du message
+	*/
 	GetIdByMessageListElement(element){
 		return $(element).index('#messageList>.messageItem');
 	}
 
+	/**
+	* Récupère l'element HTML d'un message a partir de sont index
+	* @param {Number} id - index du message
+	* @return {Object} Jquery Element du message
+	*/
 	GetMessageListElementById(id){
 		return $($(`#messageList>.messageItem`).get(id));
 	}
 
+	/**
+	* crée l'element HTML correspondant a un message & y attache les evènement neccéssaire a la gestion
+	* @param {Object} message - toutes les informations concernant le message
+	* @param {Number} index - index du message
+	* @return {Object} Jquery Element du message
+	*/
 	messageItemDom(message, index){
 		let messageItem = $(
 			`<li class="list-group-item d-flex align-items-center messageItem">
@@ -275,6 +353,11 @@ class Editor extends Story{
 	    return messageItem;
 	}
 
+	/**
+	* déplace l'index d'un message
+	* @param {Number} currentId - index actuel du message
+	* @param {Number} move - direction du déplacement (1 = vers la fin / -1 = vers le début)
+	*/
 	MoveSelectedMessage(currentId, move){
 		if(currentId+move >= 0 && currentId+move < this.conversation.length){
 			var target = $(`#messageList>li:nth-child(${(currentId+move)+1})`);
@@ -286,7 +369,9 @@ class Editor extends Story{
 			this.conversation.splice((currentId+move),0 ,this.conversation.splice(currentId,1)[0]);
 		}
 	}
-
+	/**
+	* reception de l'évenement du formulaire d'ajout de message rapide
+	*/
 	quickMessageFormSubmit(){
 		let msgForm = document.forms["quickMessageForm"];
 		let text = msgForm["text"].value;
@@ -305,7 +390,9 @@ class Editor extends Story{
 		$("#editableQuickText").text("");
 		this.MessagelistScrollDown();
 	}
-
+	/**
+	* Reception de l'évenement du formulaire des messages
+	*/
 	messageFormSubmit(){
 		let msgForm = document.forms["messageForm"];
 		let isNew = msgForm["isNew"].value;
@@ -333,22 +420,42 @@ class Editor extends Story{
 		$(".messageListContainer").show();
 		this.MessagelistScrollDown();
 	}
+
+	/**
+	* Ajoute un nouveau message a la story
+	* @param {Number} id - index de positionnement du message
+	* @param {Object} message - toutes les informations concernant le messageEdit
+	*/
 	insertMessageEditor(id, message){
 		$("#messageList>li").last().before(this.messageItemDom(message, id));
 		this.conversation.splice(id,0 ,message);
 		saveStory();
 	}
 
+	/**
+	* Edition d'un message a la story
+	* @param {Number} id - index de positionnement du message
+	* @param {Object} message - toutes les informations concernant le messageEdit
+	*/
 	editMessageEditor(id, message){
 		this.conversation.splice(id, 1, message);
 		this.GetMessageListElementById(id).replaceWith(this.messageItemDom(message, id));
 	}
 
+	/**
+	* Suppresion d'un message a la story
+	* @param {Number} id - index de positionnement du message
+	*/
 	DeleteMessageEditor(id){
 		this.conversation.splice(id, 1);
 		this.GetMessageListElementById(id).remove();
 	}
 
+	/**
+	* Charge le formulaire des messages avec les informations neccessaire
+	* @param {Number} id - index de positionnement du message
+	* @param {Bool} isNew -  Flag pour un nouveau message par défaut il n'est pas un nouveau
+	*/
 	LoadSelectedMessage(id, isNew = false){
 		$(".messageListContainer").hide();
 		$(".messageFormContainer").show();
@@ -398,6 +505,9 @@ class Editor extends Story{
 //## endregion
 
 //## region Config
+	/**
+	* Réception de l'évenement de soumission du formulaire de paramétrage de story
+	*/
 	configFormSubmit(){
 		let configForm = document.forms["configForm"];
 		this.name = configForm['storyName'].value;
@@ -411,6 +521,9 @@ class Editor extends Story{
 			this.config.adsEachMessage = 0;
 	}
 
+	/**
+	* Charge le formulaire de paramètrage de la story avec les informations néccessaire
+	*/
 	loadConfig(){
 		let configForm = document.forms["configForm"];
 		configForm['storyName'].value = this.name;
@@ -429,19 +542,22 @@ class Editor extends Story{
 	}
 //## endregion
 
-
-
-	changeViewMode(previsual, resumeId = -1){//False = user / true = editor
+	/**
+	* alterne entre affichage des messages instantané & affichage simulaire au lecteur (affichage des messages progressif selon paramètre de la story)
+	* @param {Bool} mode - Flag définissant le mode a utilisé (false = user / true = editor)
+	* @param {Number} resumeId - défini un nombre de message a afficher instantanément avant de revenir a un affichage de lecteur
+	*/
+	changeViewMode(mode, resumeId = -1){
 		this.resumeId = resumeId;
 		//this.editor = mode;
-		if(previsual === false){
+		if(mode === false){
 			$("#viewMode").prop("checked", false);
 			this.editor=true;
 			if(this.tapeRequiredFlag){
 				this.tapeRequiredFlag = false;
 				$("#tapeLogo").hide();
 			}
-		}else if(previsual === true){
+		}else if(mode === true){
 			$("#viewMode").prop("checked", true);
 			this.editor=false;
 		}

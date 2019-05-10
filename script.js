@@ -1,4 +1,5 @@
-/* Code Editor */
+//## region Editor Init
+
 var CodeMirrorCustomCSS = CodeMirror.fromTextArea(document.getElementById('cssEditor'), {
   mode:  "css",
   lineNumbers: true,
@@ -8,7 +9,6 @@ var CodeMirrorCustomCSS = CodeMirror.fromTextArea(document.getElementById('cssEd
       mode : 'edit'
   },
 });
-
 var CodeMirrorAnimations = CodeMirror.fromTextArea(document.getElementById('animationsEditor'), {
   mode:  "javascript",
   lineNumbers: true,
@@ -21,7 +21,6 @@ var CodeMirrorAnimations = CodeMirror.fromTextArea(document.getElementById('anim
 var quill = new Quill('#message-editor', {
 	theme: 'snow'
 });
-
 var quillCharDesc = new Quill('#charDesc-editor', {
     theme: 'snow'
 });
@@ -32,61 +31,9 @@ $(function () {
 
 let editor = new Editor();
 var id;
-$(document).ready(function () {
-    //Height adjust
-    /*let vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-    window.addEventListener('resize', () => {
-      // We execute the same script as before
-      let vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
-    });*/
-    firebase.auth().onAuthStateChanged(function(user) {
-      id = findGetParameter("id");
-      if (user && id != null) {
-        // $(".editor-toolbar").collapse();
-        db.collection('stories').doc(id).get().then((doc) => {
-          if(doc.exists){
-            if(doc.data().authors.findIndex(ref => ref === user.uid) != -1)
-              loadStory(doc);
-            else{
-              alert("Vous ne disposez pas d'accès d'auteur pour cette story");
-              window.location.replace(window.location.origin);
-            }
-          }else{
-            alert("Story Introuvable");
-            window.location.replace(window.location.origin);
-          }
-        })
-      } else {
-        // No user is signed in.
-        window.location.replace(window.location.origin);
-      }
-    });
-});
+//## endregion
 
-/****************** Date Management ***************************/
-
-//
-// function loadStoryConfirm(storyRef, needConfirm = true){
-//     ConfirmDialog(
-//         "Chargement d'une story",
-//         "Vous êtes sur le point de "+( storyRef == null ? "créer une nouvelle story." : "charger une autre story.")+ " Souhaitez vous sauvegarder votre story actuel ?",
-//         function(answer){
-//             if(answer){
-//                 saveStory(login, function(){
-//                     loadStory(storyRef);
-//                 });
-//             }
-//             else{
-//                 loadStory(storyRef)
-//             }
-//             $('.story').removeClass('active');
-//             $(`#${storyRef}`).addClass('active');
-//         }
-//     );
-// }
-
+//## region Story
 function loadStory(doc){
   editor.loadStoryEditor(doc.id, doc.data());
   $(".navbar-brand").text(editor.name);
@@ -118,7 +65,9 @@ function saveStory(callback = null){
       console.log('Error updating document '+editor.storyRef, err);
   });
 }
+//## endregion
 
+//## region DialogueBox
 // function ConfirmDialog(title, message, callback) {
 //     $('<div></div>').appendTo('body')
 //     .html('<div><h6>'+message+'</h6></div>')
@@ -148,9 +97,9 @@ function saveStory(callback = null){
 //         }
 //     });
 // };
+//## endregion
 
 //## region ExcelExport
-
 function ImportExcel(title, message, callback) {
     $('<div></div>').appendTo('body')
     .html('<div><h6>'+message+'</h6></div>')
@@ -279,7 +228,7 @@ let parseExcel = function(file) {
 
 Dropzone.autoDiscover = false;
 
-var MessageContentDropzone = new Dropzone("#MessageDropzone", { // Make the whole body a dropzone
+var messageContentDropzone = new Dropzone("#MessageDropzone", {
   url: '/',
   addRemoveLinks: true,
   method: 'put',
@@ -295,7 +244,7 @@ var MessageContentDropzone = new Dropzone("#MessageDropzone", { // Make the whol
   dictFileTooBig: "Votre fichier ne dois pas dépasser {{maxFilesize}} Mo (fichier actuel = {{filesize}} Mo)."
 });
 
-MessageContentDropzone.on("addedfile", function(file) {
+messageContentDropzone.on("addedfile", function(file){
   var reader = new FileReader();
   if (MessageContentDropzone.files.length < 4 ) {
       reader.onload = function(event) {
@@ -315,7 +264,7 @@ MessageContentDropzone.on("addedfile", function(file) {
   }
 });
 
-MessageContentDropzone.on("removedfile", function(file){
+messageContentDropzone.on("removedfile", function(file){
   var storageRef = firebase.storage().ref("/");
   storageRef.child(file.fullPath).delete().then(
     function(){
@@ -326,45 +275,44 @@ MessageContentDropzone.on("removedfile", function(file){
     });
   });
 
-  var characterAvatarDropzone = new Dropzone("#CharacterDropzone", { // Make the whole body a dropzone
-    url: '/',
-    addRemoveLinks: true,
-    method: 'put',
-    chunking:true,
-    forceChunking:true,
-    autoQueue: false,
-    autoProcessQueue: false,
-    maxFiles:1,
-    maxFilesize:25,
-    acceptedFiles: "image/*",
-    resizeWidth:48,
-    resizeHeight:48,
-    dictDefaultMessage:"Déplacer ou cliquer ici pour mettre en ligne vos fichiers",
-    dictInvalidFileType: "Ce fichier n'est pas au bon format",
-    dictFileTooBig: "Votre fichier ne dois pas dépasser {{maxFilesize}} Mo (fichier actuel = {{filesize}} Mo)."
-  });
-  characterAvatarDropzone.autoDiscover = false;
+var characterAvatarDropzone = new Dropzone("#CharacterDropzone", {
+  url: '/',
+  addRemoveLinks: true,
+  method: 'put',
+  chunking:true,
+  forceChunking:true,
+  autoQueue: false,
+  autoProcessQueue: false,
+  maxFiles:1,
+  maxFilesize:25,
+  acceptedFiles: "image/*",
+  resizeWidth:48,
+  resizeHeight:48,
+  dictDefaultMessage:"Déplacer ou cliquer ici pour mettre en ligne vos fichiers",
+  dictInvalidFileType: "Ce fichier n'est pas au bon format",
+  dictFileTooBig: "Votre fichier ne dois pas dépasser {{maxFilesize}} Mo (fichier actuel = {{filesize}} Mo)."
+});
 
-  characterAvatarDropzone.on("addedfile", function(file) {
-    var reader = new FileReader();
-    if (characterAvatarDropzone.files.length < 4 ) {
-        reader.onload = function(event) {
-           // event.target.result contains base64 encoded image
-          console.log("file being uploaded ")
-          console.log(file);
-          storage_upload(event.target.result, file, characterAvatarDropzone ,(r)=>{
-            console.log("Storage upload response")
-            console.log(r)
-            $('input[name="avatar"]').val(r.publicURL);
-          })
-        };
-        reader.readAsDataURL(file);
-    }else {
-      console.log('skipping file as we are excceding the upload limit')
-    }
-  });
+characterAvatarDropzone.on("addedfile", function(file){
+  var reader = new FileReader();
+  if (characterAvatarDropzone.files.length < 4 ) {
+      reader.onload = function(event) {
+         // event.target.result contains base64 encoded image
+        console.log("file being uploaded ")
+        console.log(file);
+        storage_upload(event.target.result, file, characterAvatarDropzone ,(r)=>{
+          console.log("Storage upload response")
+          console.log(r)
+          $('input[name="avatar"]').val(r.publicURL);
+        })
+      };
+      reader.readAsDataURL(file);
+  }else {
+    console.log('skipping file as we are excceding the upload limit')
+  }
+});
 
-  characterAvatarDropzone.on("removedfile", function(file){
+characterAvatarDropzone.on("removedfile", function(file){
     var storageRef = firebase.storage().ref("/");
     storageRef.child(file.fullPath).delete().then(
       function(){
@@ -375,7 +323,9 @@ MessageContentDropzone.on("removedfile", function(file){
       });
     });
 
-//## region uploadToFirebase
+/**
+* Upload To Firebase
+*/
 function storage_upload(filedata, filehandle, DropzoneHandle, cb) {
 
   // Getting Handle of the progressbar element of current file //
@@ -441,6 +391,38 @@ function storage_upload(filedata, filehandle, DropzoneHandle, cb) {
     )
 
 }
-//## endregion
 
 //## endregion
+
+$(document).ready(function () {
+    firebase.auth().onAuthStateChanged(function(user) {
+      id = findGetParameter("id");
+      //est ce que l'utilisateur est connecté et la clé de la story a charger est retrouvé
+      if (user && id != null) {
+        db.collection('stories').doc(id).get().then((doc) => {//On essai de recupèrer la story
+          //si elle existe bien
+          if(doc.exists){
+            //si la personne en question a le droit d'éditer la story
+            if(doc.data().authors.findIndex(ref => ref === user.uid) != -1)
+              loadStory(doc);
+            else{
+              //l'Utilisateur ne dispose pas de l'accès
+              alert("Vous ne disposez pas d'accès d'auteur pour cette story");
+              window.location.replace(window.location.origin);
+            }
+          }else{
+            //clé de la story introuvable dans la base
+            alert("Story Introuvable");
+            window.location.replace(window.location.origin);
+          }
+        })
+        .catch(err => {
+          console.log('Error getting documents', err);
+        });
+      } else {
+        // Not connected
+        alert("Vous devez être connecté pour editer une story");
+        window.location.replace(window.location.origin);
+      }
+    });
+});

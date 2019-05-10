@@ -75,7 +75,7 @@ class Story {
 	}
 
 	contructor(story, chatElement){
-
+		console.log("oubli")
 		generateMessagesGroup();
 	}
 

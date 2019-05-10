@@ -1,7 +1,6 @@
-
 $(document).ready(function (){
-
   ui = new firebaseui.auth.AuthUI(firebase.auth());
+
   var uiConfig = {
     callbacks: {
       signInSuccessWithAuthResult: function(authResult, redirectUrl) {
@@ -34,7 +33,9 @@ $(document).ready(function (){
     // Privacy policy url.
     privacyPolicyUrl: '<your-privacy-policy-url>'
   };
+
   loadPublishedStory();
+  
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
@@ -127,7 +128,6 @@ function loadPublishedStory(){
     }else{
       var i = 0;
       var library = $('<div class="storyList"></div>');
-      console.log((i < querySnapshot.docs.length));
       for (var y = 0; i < 16 ; y++) {
         var row = $('<div class="row"></div>');
         for (var x = 0; x < storiesPerRow && i < 24; x++) {
