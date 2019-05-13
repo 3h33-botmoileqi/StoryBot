@@ -20,9 +20,7 @@ $(document).ready(function () {
     }
     $('#tapeLogo').hide();
   });
-  /*story = new Story($('#chat'));
-  story.loadDemo();
-  story.playStory();*/
+  //Firebase
   var config = {
     apiKey: "AIzaSyA3xCApnLi	P26OGADaVD6M93ue0cHzaN3I",
     authDomain: "storybot-68a04.firebaseapp.com",
@@ -31,10 +29,11 @@ $(document).ready(function () {
     storageBucket: "storybot-68a04.appspot.com",
     messagingSenderId: "5815195510"
    };
-    firebase.initializeApp(config);
-    db = firebase.firestore();
-    storageService = firebase.storage();
+  firebase.initializeApp(config);
+  db = firebase.firestore();
+  storageService = firebase.storage();
 });
+
 function changePanel(elementId){
   //console.log(elementId);
   if(window.event){

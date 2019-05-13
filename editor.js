@@ -12,14 +12,18 @@ class Editor extends Story{
 		this.loadEditor();
 	}
 //## region Load & save
-	//débute la lecture de la story
+	/**
+	* débute la lecture de la story
+	*/
 	StartStoryEditor(){
 		$("#chat").empty();
 		this.tapeRequiredFlag = false;
 		this.playStory();
 	}
 
-	//Charge une story provenant d'une base de donnée
+	/**
+	* Charge une story provenant d'une base de donnée
+	*/
 	loadStoryEditor(id, story){
 		this.storyRef = id;
 		this.authors = story.authors;
@@ -28,11 +32,34 @@ class Editor extends Story{
 			this.loadEditor();
 	}
 
-	//charge les données de la story message / character / author dans l'éditeur
+	/**
+	*charge les données de la story message / character / author dans l'éditeur
+	*/
 	loadEditor(){
 		this.loadAuthors();
 		this.loadMessages();
 		this.loadCharacters();
+	}
+	/**
+	* Sauvegarde la story dans la base de donnée
+	* @param {Function} callback - exécution retour
+	*/
+	saveStory(callback = null){
+	  db.collection("stories").doc(id).get().then(doc => {
+	    doc.ref.update({
+	        name: editor.name,
+	        config: editor.config,
+	        characters: editor.characters,
+	        conversation: editor.conversation.map((obj)=> {return Object.assign({}, obj)})
+	    })
+	    localStorage["lastStory"] = doc.id;
+	    if(callback != null){
+	        callback();
+	    }
+	  })
+	  .catch(err => {
+	      console.log('Error updating document '+editor.storyRef, err);
+	  });
 	}
 //## endregion
 
@@ -234,7 +261,7 @@ class Editor extends Story{
 				i--
 			}
 		}
-		this.DeleteCharacter(characterName);
+		delete this.characters[characterName]
 		 $(".characterList").each(function(indexList, list){
 			if($(list).is("#mainCharacterList")){
 				//Delete LI
@@ -351,6 +378,16 @@ class Editor extends Story{
 	    $(messageItem).find('.messageDown').click(function(){editor.MoveSelectedMessage(editor.GetIdByMessageListElement(messageItem), 1)});
         $(messageItem).find('.text').on('input',function(){editor.onMessageInput(editor.GetIdByMessageListElement(messageItem), $(this).text());});
 	    return messageItem;
+	}
+
+	/**
+	* Reçois les évenement d'édition instantané des messages
+	* @param {Number} id - index du message
+	* @param {String} text - nouveau text du message
+	*/
+	onMessageInput(id, text){
+		this.conversation[id].text = text;
+		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM(this.config.displayMessageDate));
 	}
 
 	/**

@@ -35,7 +35,7 @@ $(document).ready(function (){
   };
 
   loadPublishedStory();
-  
+
   firebase.auth().onAuthStateChanged(function(user) {
     if (user) {
       // User is signed in.
@@ -54,7 +54,6 @@ $(document).ready(function (){
     }
   });
 });
-
 
 function loadStories(login){
   $("#storiesList").empty();
@@ -102,11 +101,59 @@ function createNewStory(){
       authors: [firebase.auth().currentUser.uid],
       name: "New Story",
       config: {
+  			"isPublished": false,
   			"adsEachMessages": -1,
   			"displaycharacterName":true,
   			"displaycharacterAvatar":true,
   			"displayMessageDate":true,
-  			"customCSS":""
+  			"customCSS": `/*Toutes les en-tetes*/
+    .messagesGroup-header{
+
+    }
+    /*En-tetes gauche*/
+    .header-left{
+
+    }
+    /*Avatar*/
+    .header-left .avatar{
+
+    }
+    /*Nom personnage*/
+    .header-left h6{
+
+    }
+
+    /*En-tetes droite*/
+    .header-right{
+
+    }
+    /*Avatar*/
+    .header-right .avatar{
+
+    }
+    /*Nom personnage*/
+    .header-right h6{
+
+    }
+
+    /*Toutes les blocs messages*/
+    .message .message-container{
+
+    }
+
+    /*Bloc message Gauche*/
+    .message-left .message-container{
+
+    }
+
+    /*Bloc message droit*/
+    .message-right .message-container{
+
+    }
+    /*Arrière plans */
+    #chatPanel, #example{
+
+    }`
   		},
       characters: {},
       conversation: []
@@ -119,9 +166,9 @@ function createNewStory(){
   })
 }
 
-var storiesPerRow = 4;//Must be X % 2 = 0
-var gridSize = 12 / storiesPerRow;
 function loadPublishedStory(){
+  var storiesPerRow = 4;//Must be X % 2 = 0
+  var gridSize = 12 / storiesPerRow;
   db.collection("stories").where("config.isPublished", "==", true).get().then(querySnapshot => {
     if(querySnapshot.empty){
       console.log("aucun stories disponible");

@@ -20,7 +20,6 @@
 			<!-- Firebase -->
 			<link type="text/css" rel="stylesheet" href="https://cdn.firebase.com/libs/firebaseui/3.5.2/firebaseui.css" />
 			<!-- Dropzone -->
-	    <link rel="stylesheet" href="dropzone.css">
 			<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.css" integrity="sha256-0Z6mOrdLEtgqvj7tidYQnCYWG3G2GAIpatAWKhDx+VM=" crossorigin="anonymous" />
 	</head>
 	<body data-__gyazo-extension-added-paste-support="true">
@@ -52,24 +51,10 @@
 			      <li class="nav-item">
 			        <a class="nav-link" href="#config" onclick="changePanel('#configPanel');editor.loadConfig();">Paramètrage</a>
 			      </li>
-			      <!-- <li class="nav-item dropdown">
-			        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			          Dropdown
-			        </a>
-			        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-			          <a class="dropdown-item" href="#">Action</a>
-			          <a class="dropdown-item" href="#">Another action</a>
-			          <div class="dropdown-divider"></div>
-			          <a class="dropdown-item" href="#">Something else here</a>
-			        </div>
-			      </li>
-			      <li class="nav-item">
-			        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-			      </li> -->
 			    </ul>
 					<ul class="navbar-nav ml-auto">
 						<li class="nav-item">
-							<a class="nav-link" href="#" onclick="saveStory(function(){alert('Story Sauvegardé');})">Sauvegarder</a>
+							<a class="nav-link" href="#" onclick="editor.saveStory(function(){alert('Story Sauvegardé');})">Sauvegarder</a>
 						</li>
 					</ul>
 			  </div>
@@ -436,6 +421,64 @@
     <script src="message.js"></script>
     <script src="story.js"></script>
     <script src="editor.js"></script>
-    <script src="script.js"></script>
+    <script src="thirdParty.js"></script>
+		<script>
+			let editor = new Editor();
+			var id;
+			$(document).ready(function () {
+					firebase.auth().onAuthStateChanged(function(user) {
+						id = findGetParameter("id");
+						//est ce que l'utilisateur est connecté et la clé de la story a charger est retrouvé
+						if (user && id != null) {
+							db.collection('stories').doc(id).get().then((doc) => {//On essai de recupèrer la story
+								//si elle existe bien
+								if(doc.exists){
+									//si la personne en question a le droit d'éditer la story
+									if(doc.data().authors.findIndex(ref => ref === user.uid) != -1){
+										// editor.loadStory(doc);
+										  editor.loadStoryEditor(doc.id, doc.data());
+											//Load story name
+											document.title = editor.name+" - StoryBot";
+										  $(".navbar-brand").text(editor.name);
+										  //link css editor with custom css
+										  if(editor.config['customCSS']){
+										    CodeMirrorCustomCSS.setValue(editor.config['customCSS']);
+											}
+										  localStorage["lastStory"] = doc.id;
+										  changePanel("#chatPanel");
+										  editor.StartStoryEditor();
+									}else{
+										//l'Utilisateur ne dispose pas de l'accès
+										alert("Vous ne disposez pas d'accès d'auteur pour cette story");
+										window.location.replace(window.location.origin);
+									}
+								}else{
+									//clé de la story introuvable dans la base
+									alert("Story Introuvable");
+									window.location.replace(window.location.origin);
+								}
+							})
+							.catch(err => {
+								console.log('Error getting documents', err);
+							});
+						} else {
+							// Not connected
+							alert("Vous devez être connecté pour editer une story");
+							window.location.replace(window.location.origin);
+						}
+					});
+			});
+			
+			$(window).bind('keydown', function(event) {
+			    if (event.ctrlKey || event.metaKey) {
+			        switch (String.fromCharCode(event.which).toLowerCase()) {
+			        case 's':
+			            event.preventDefault();
+							    editor.saveStory(function(){alert('Story Sauvegardé');})
+			            break;
+			        }
+			    }
+			});
+		</script>
 	</body>
 </html>

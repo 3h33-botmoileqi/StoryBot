@@ -1,5 +1,5 @@
 class Story {
-	constructor(chatElement){
+	constructor(){
 		this.name = "New Story";
 		this.config = {
 			"isPublished": false,
@@ -74,11 +74,6 @@ class Story {
 		//this.loadDemo();
 	}
 
-	contructor(story, chatElement){
-		console.log("oubli")
-		generateMessagesGroup();
-	}
-
 	loadStory(story){
 		this.name = story.name;
 		this.config = story.config;
@@ -89,22 +84,8 @@ class Story {
 			if(message.animations)
 				this.conversation[this.conversation.length-1].AddAnimations(message.animations);
 		}
+		this.loadCSS(story.config.customCSS);
 	}
-
-	log(){
-		console.log(this);
-	}
-
-	waitFor(initialState, delay, callback) {
-	    return new Promise((resolve,reject) => {
-	      setTimeout(() => {
-	      	if(initialState == this.editor){
-	      		callback();
-	        	resolve('delayed');
-	      	}
-	      }, delay);
-	    }).catch(err => console.log(err));
-	  }
 
 	async playStory(id = 0){
 		this.id = id;
@@ -119,12 +100,19 @@ class Story {
 					}
 		    }
 		}
-	    //Si la story est fini sinon attend un touch
-	    /*
-	    if(this.id >= this.conversation.length)
-	      console.log('Done!');
-	    */
+	    /*if(this.id >= this.conversation.length) console.log('Done!');//Si la story est fini sinon attend un touch */
 	}
+
+	waitFor(initialState, delay, callback) {
+	    return new Promise((resolve,reject) => {
+	      setTimeout(() => {
+	      	if(initialState == this.editor){
+	      		callback();
+	        	resolve('delayed');
+	      	}
+	      }, delay);
+	    }).catch(err => console.log(err));
+	  }
 
 	StoryNextMessage(OnTape = false){
 		try{
@@ -135,16 +123,13 @@ class Story {
 				$(this.chatElement).append(this.currentMessagesGroup);
 			}
 			let message = this.conversation[this.id].toDOM(this.config.displayMessageDate);
-			this.insertMessageElement(message, $(this.currentMessagesGroup).children("ul"));
+			$(this.currentMessagesGroup).children("ul").append(message);
 			if(this.conversation[this.id].animations){
 				for(let animation of this.conversation[this.id].animations){
 					$(message).animate(animation.properties, animation.duration, animation.easing);
 				}
 			}
-			//$("#chatPanel").scrollTop($("#chatPanel").prop('scrollHeight'));
-			var page = $(this).attr('href'); // Page cible
-			var speed = 400; // Durée de l'animation (en ms)
-			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, speed ); // Go
+			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, 400 );
 			this.id++;
 			if(OnTape){
 				this.tapeRequiredFlag = false;
@@ -154,12 +139,6 @@ class Story {
 		catch(err){
 			console.log(err);
 		}
-	}
-
-	/******************* Character Management ***********************/
-
-	DeleteCharacter(characterName){
-    	delete this.characters[characterName]
 	}
 
 	/******************* MESSAGE DOM Management**********************/
@@ -193,45 +172,6 @@ class Story {
 		}
 		$('#characterModal #characterName').text(characterName);
 		$('#characterModal').modal('toggle');
-	}
-
-	GetIdByMessageElement(element){
-		return $(element).index('#chat .message');
-	}
-
-	GetMessageElementById(id){
-		return $($(`#chat .message`).get(id));
-	}
-
-	insertMessageElement(message, parent,id=null){
-		if(!id){
-	        $(parent).append(message);
-		}else{
-
-		}
-	}
-
-	/*EditMessageElement(message, newMessage){
-		let newMessageElement = $(newMessage.toDOM());
-		$(message).replaceWith(newMessageElement);
-    	this.conversation.splice(this.GetIdByMessageElement(message), 1, newMessage);
-	}*/
-
-	DeleteMessageElement(id){
-		let message = this.GetMessageElementById(id);
-		let messagesGroupList = $(message).parent();
-		if($(messagesGroupList).children().length == 1){
-			$(messagesGroupList.parent()).remove();
-		}
-		else{
-			$(message).remove();
-		}
-    	this.conversation.splice(id, 1);
-	}
-
-	onMessageInput(id, text){
-		this.conversation[id].text = text;
-		this.GetMessageElementById(id).replaceWith(this.conversation[id].toDOM(this.config.displayMessageDate));
 	}
 
 
