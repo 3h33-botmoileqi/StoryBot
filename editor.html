@@ -182,7 +182,6 @@
 								<label for="formControlRange">Délai (seconde): </label>
 								<input type="number" id="delayOutput" class="form-control" name="delay" min="0">
 								<input type="range" class="form-control-range" id="delayInput"oninput="delayOutput.value = delayInput.value" value="0" min="0" max="60">
-
 	        					<div class="form-group form-check">
 								  <input class="form-check-input" type="checkbox" value="" id="defaultCheck1" name="tapeFlag">
 								  <label class="form-check-label" for="defaultCheck1">
@@ -341,10 +340,6 @@
   					</div>
   				</div>
       	</div>
-				<!-- <div id="loginPanel" class="page" style="display:none">
-					<div id="firebaseui-auth-container"></div>
-					<div id="loader">Loading...</div>
-				</div> -->
       	<div id="cloudPanel" class="page" style="display:none">
       		<div  class="d-flex">
   					<input type="text" name="storyFilter" placeholder="Recherche..." style="width: 100%">
@@ -372,7 +367,7 @@
 			    		<p id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
 			    	</div>
 			    	<div style="text-align: center;">
-			    		<video id="characterVideo" controls autoplay muted src="https://app.coverr.co/s3/mp4/Road-Tripping.mp4" style="width: 25vw">
+			    		<video id="characterVideo" controls autoplay muted src="" style="width: 25vw">
 			    			Your browser does not support the video tag.
 			    		</video>
 			    	</div>
@@ -383,7 +378,7 @@
     <!-- jQuery CDN -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
     <!-- jQuery UI -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js" integrity="sha256-T0Vest3yCU7pafRw9r+settMBX6JkKN06dqBnpQ8d30=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js" integrity="sha256-KM512VNnjElC30ehFwehXjx1YCHPiQkOPmqnrWtpccM=" crossorigin="anonymous"></script>
     <!-- Popper.JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <!-- Bootstrap JS -->
@@ -398,23 +393,22 @@
     <!-- Socket.io JS-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
     <!-- Font Awesome JS -->
-    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/solid.js" integrity="sha384-tzzSw1/Vo+0N5UhStP3bvwWPq+uvzCMfrN1fEFe+xBmv1C/AtVX5K0uZtmcHitFZ" crossorigin="anonymous"></script>
-    <script defer="" src="https://use.fontawesome.com/releases/v5.0.13/js/fontawesome.js" integrity="sha384-6OIrr52G08NpOFSZdxxz1xdNSndlD4vdcf/q2myIUVO0VsqaGHJsB0RaBE01VTOY" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/js/solid.min.js" integrity="sha256-Qg/zzHQm2attQOH1sZs94E2AbUdFQmR9RuKbnExYRe0=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/js/fontawesome.min.js" integrity="sha256-KZjyrvXj0bZPo6kaV2/gP3h2LXakV/QALQ6UmBhzqD0=" crossorigin="anonymous"></script>
     <!-- CodeMirror-->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/codemirror.js" integrity="sha256-gaVop7C3WHsJH7u9FO7YwYLSLGiBGr6wTm2o3huyN24=" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/javascript/javascript.js" integrity="sha256-Wyfz01iV9zeqL2igt5tF1xuVBaRZJhsd/6N9Ap/i5sU=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.46.0/codemirror.min.js" integrity="sha256-OMbqhJ5GYA+UQ2a9UE9iXHA1kn3hlZCFL5aZmpSp/+M=" crossorigin="anonymous"></script>    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/javascript/javascript.js" integrity="sha256-Wyfz01iV9zeqL2igt5tF1xuVBaRZJhsd/6N9Ap/i5sU=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/mode/css/css.js" integrity="sha256-X/teJqHXUccfWWBeziAxGjeC7jl07Gaw/FkzK78UMs0=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.45.0/addon/edit/closebrackets.js" integrity="sha256-J+IeaQd1P4WqdI6BNbLIiQ8QuzlexywhSmLrFd4H2g0=" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/codemirror-colorpicker@1.9.50/dist/codemirror-colorpicker.min.js" integrity="sha256-xpnjpF/9oKFV6YX0FcvYp7rk+FgsPVMD0JjB1evfpys=" crossorigin="anonymous"></script>
     <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/5.9.4/firebase-firestore.js"></script>
-		<script src="https://www.gstatic.com/firebasejs/5.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-firestore.js"></script>
+		<script src="https://www.gstatic.com/firebasejs/6.0.2/firebase-storage.js"></script>
 		<script src="https://www.gstatic.com/firebasejs/ui/3.6.0/firebase-ui-auth__fr.js"></script>
     <!-- Excel Reader -->
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.2.0/jszip.min.js" integrity="sha256-VwkT6wiZwXUbi2b4BOR1i5hw43XMzVsP88kpesvRYfU=" crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.14.3/xlsx.min.js" integrity="sha256-/YsIw0C9o5pLqqgKbSVgGl2a37ar8yIPHSkdeWbOcq4=" crossorigin="anonymous"></script>
 		<!-- Dropzone -->
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.5.1/dropzone.js" integrity="sha256-awEOL+kdrMJU/HUksRrTVHc6GA25FvDEIJ4KaEsFfG4=" crossorigin="anonymous"></script>
     <script src="commun.js"></script>
@@ -468,16 +462,16 @@
 						}
 					});
 			});
-			
+
 			$(window).bind('keydown', function(event) {
-			    if (event.ctrlKey || event.metaKey) {
-			        switch (String.fromCharCode(event.which).toLowerCase()) {
-			        case 's':
-			            event.preventDefault();
-							    editor.saveStory(function(){alert('Story Sauvegardé');})
-			            break;
-			        }
-			    }
+		    if (event.ctrlKey || event.metaKey) {
+	        switch (String.fromCharCode(event.which).toLowerCase()) {
+	        case 's':
+	            event.preventDefault();
+					    editor.saveStory(function(){alert('Story Sauvegardé');})
+	            break;
+	        }
+		    }
 			});
 		</script>
 	</body>

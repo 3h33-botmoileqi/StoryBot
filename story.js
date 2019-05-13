@@ -130,6 +130,10 @@ class Story {
 				}
 			}
 			$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, 400 );
+			//if(!editor)
+			//	$("#chatPanel").animate( { width: "ease-out",scrollTop: $("#chatPanel").prop('scrollHeight') }, 400 );
+			//else
+			//	setTimeout(function(){$("#chatPanel").scrollTop($("#chatPanel").height())},100);
 			this.id++;
 			if(OnTape){
 				this.tapeRequiredFlag = false;
@@ -154,7 +158,14 @@ class Story {
     			</div>
     			<ul></ul>
 	        </li>`);
-		GroupDom.find(".messagesGroup-header").click(function(){editor.loadCharacterModal(lastCharacter)})
+		GroupDom.find(".messagesGroup-header").click(function(e){
+			e.stopPropagation()
+			if(typeof editor !== 'undefined'){
+				editor.loadCharacterModal(lastCharacter)
+			}else{
+				story.loadCharacterModal(lastCharacter)
+			}
+		})
 		return GroupDom;
 	}
 
