@@ -1,4 +1,27 @@
+/**
+* @todo supprimer la dépendence a la variable editor (doit exister uniquement dans la classe editeur)
+*/
 class Story {
+	/**
+	* @property {String} name Nom de la storyRef
+	* @type {Object} config - regroupe tous les paramètres de la story
+	* @property {Bool} config.isPublished défini si la story est publier
+	* @property {Number} config.adsEachMessages défini le nombre de message a lire avant d'afficher une loadPublishedStory
+	* @property {Bool} config.displaycharacterName affiche ou non les noms des personnage dans le chatPanel
+	* @property {Bool} config.displaycharacterAvatar affiche ou non l'avatar des personnage dans le chatPanel
+	* @property {Bool} config.displayMessageDate affiche ou non la date des messages dans le chatPanel
+	* @property {String} config.customCSS le CSS personnalisé de la story
+	* @property {Object} characters la liste des personnages de la story
+	* @property {Array<Message>} conversation la liste des messages de la storyRef
+	* @property {Object} chatElement Jquery object contenant la ref du DOM du chatPanel
+	* @property {Bool} tapeRequiredFlag Flag si il est néccessaire de toucher l'ecran pour continuer la story
+	* @property {Object} currentMessagesGroup Jquery object contenant le dernier element des messagesgroup du chat
+	* @property {String} lastCharacter nom du personnage du dernier message afficher dans le chat
+	* @property {Number} id index du dernier message afficher dans le chat
+	* @property {Number} resumeId index du message sur lequel l'editeur dois reprendre sa lecture normale ("Lecture a partir du message n°X")
+	* @property {Bool} editor défini la méthode d'affichage de la story par défaut true (false = user / true = editor)
+	* @property {Object} cssSheet DOM Element pour l'utilisation du CSS personalisé
+	*/
 	constructor(){
 		this.name = "New Story";
 		this.config = {
@@ -74,6 +97,10 @@ class Story {
 		//this.loadDemo();
 	}
 
+	/**
+	* charge un story localement
+	* @param {Story} story - story à charger localement
+	*/
 	loadStory(story){
 		this.name = story.name;
 		this.config = story.config;
@@ -87,6 +114,10 @@ class Story {
 		this.loadCSS(story.config.customCSS);
 	}
 
+	/**
+	* fonction asynchrone de leture de la story
+	* @param {Number} id - démarre la story a partir de cette index (par défaut : 0)
+	*/
 	async playStory(id = 0){
 		this.id = id;
 		if(this.conversation.length){
@@ -103,17 +134,28 @@ class Story {
 	    /*if(this.id >= this.conversation.length) console.log('Done!');//Si la story est fini sinon attend un touch */
 	}
 
+	/**
+	* Fonction de delai entre chaque message prévention d'erreur
+	* (vérifie que le mode d'affichage n'a pas était changer en parallel de l'affichage de la story)
+	* @param {bool} initialState - mode initial au début de la lecture de la story
+	* @param {Number} delay - temps d'attente
+	* @param {Function} callback - exécution retour
+	*/
 	waitFor(initialState, delay, callback) {
-	    return new Promise((resolve,reject) => {
-	      setTimeout(() => {
-	      	if(initialState == this.editor){
-	      		callback();
-	        	resolve('delayed');
-	      	}
-	      }, delay);
-	    }).catch(err => console.log(err));
-	  }
+    return new Promise((resolve,reject) => {
+      setTimeout(() => {
+      	if(initialState == this.editor){
+      		callback();
+        	resolve('delayed');
+      	}
+      }, delay);
+    }).catch(err => console.log(err));
+  }
 
+	/**
+	* Affiche le prochain message dans le chat
+	* @param {Bool} OnTape - Défini si la fonction a était déclencher par un touch sur le chat
+	*/
 	StoryNextMessage(OnTape = false){
 		try{
 			this.currentMessagesGroup = $("#chat .messagesGroup").length ? $("#chat .messagesGroup").last() : null;
@@ -145,8 +187,33 @@ class Story {
 		}
 	}
 
-	/******************* MESSAGE DOM Management**********************/
+	/**
+	* fonction d'affichage & de chargement de la fenetre de présentation des Personnages
+	* @param {String} characterName - nom du personnage duquel charger les informations
+	*/
+	loadCharacterModal(characterName){
+		$('#characterModal .avatar').attr('src', this.characters[characterName].avatar);
+		if(this.characters[characterName].video){
+			$('#characterModal #characterVideo').show();
+			$('#characterModal #characterVideo').attr('src', this.characters[characterName].video);}
+		else
+			$('#characterModal #characterVideo').hide();
+		if(this.characters[characterName].description){
+			$('#characterModal #description').text(this.characters[characterName].description);
+		}else{
+			$('#characterModal #description').text("");
+		}
+		$('#characterModal #characterName').text(characterName);
+		$('#characterModal').modal('toggle');
+	}
 
+//## region MessageGroup
+	/**
+	* crée l'element HTML correspondant a un groupe de message provenant du meme personnage & y attache les evènement neccéssaire a la gestion
+	* @param {String} side - sur quelle coté doit ce placer le groupe de message
+	* @param {String} lastCharacter - personnage auteur des messages contenu
+	* @return {object} Jquery Element du groupe de message généré
+	*/
 	MessageGroupDom(side, lastCharacter){
 		let GroupDom =  $(`
 			<li class="messagesGroup">
@@ -169,23 +236,9 @@ class Story {
 		return GroupDom;
 	}
 
-	loadCharacterModal(characterName){
-		$('#characterModal .avatar').attr('src', this.characters[characterName].avatar);
-		if(this.characters[characterName].video){
-			$('#characterModal #characterVideo').show();
-			$('#characterModal #characterVideo').attr('src', this.characters[characterName].video);}
-		else
-			$('#characterModal #characterVideo').hide();
-		if(this.characters[characterName].description){
-			$('#characterModal #description').text(this.characters[characterName].description);
-		}else{
-			$('#characterModal #description').text("");
-		}
-		$('#characterModal #characterName').text(characterName);
-		$('#characterModal').modal('toggle');
-	}
-
-
+	/**
+	* trie les messages pour en définir les groupes de messages possible
+	*/
 	generateMessagesGroup(){
 		this.messagesGroup = [];
 		var lastCharacter = this.conversation[0].character;
@@ -201,9 +254,11 @@ class Story {
 		}
 		this.messagesGroup.push(currentPoll);
 	}
+//## endregion
 
-	/*********************************************************/
-
+	/**
+	* Valeur de test a éxécuter pour charger
+	*/
 	loadDemo(){
 		this.name="Demo";
 		this.characters = {"Personnage1":{"avatar":"https://lh6.googleusercontent.com/-lr2nyjhhjXw/AAAAAAAAAAI/AAAAAAAARmE/MdtfUmC0M4s/photo.jpg?sz=48","defaultSide":"left"},"Personnage2":{"avatar":"https://a11.t26.net/taringa/avatares/9/1/2/F/7/8/Demon_King1/48x48_5C5.jpg","defaultSide":"right"},"Personnage3":{"avatar":"https://yt3.ggpht.com/a-/AN66SAyjHOM6XYXi_WmTK5F3GJ0pu3G5nQg1gVS4aA=s48-c-k-c0xffffffff-no-rj-mo","defaultSide":"left"}}
@@ -260,8 +315,10 @@ class Story {
 		//this.log();
 	}
 
+	/**
+	* @param {String} css - nouveau CSS a charger dans la story & a utilisé
+	*/
 	loadCSS(css){
-		//console.log("load css");
 		this.config["customCSS"] = css;
 		this.cssSheet.innerHTML = this.config["customCSS"];
 	}
