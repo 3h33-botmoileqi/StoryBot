@@ -34,15 +34,19 @@ $(document).ready(function () {
   storageService = firebase.storage();
 });
 
-function changePanel(elementId){
+function changePanel(elementId, callback = null){
   //console.log(elementId);
-  if(window.event){
-    $(".nav-item").removeClass("active");
-    $(window.event.target).parent().addClass("active");
+  if($(elementId).css('display') == "none"){
+    if(window.event){
+      $(".nav-item").removeClass("active");
+      $(window.event.target).parent().addClass("active");
+    }
+    $('.page').hide();
+    $(elementId).show();
+    $('.navbar-collapse.show').removeClass("show");
+    if(callback != null)
+      callback();
   }
-  $('.page').hide();
-  $(elementId).show();
-  $('.navbar-collapse.show').removeClass("show");
 }
 //Get URL parameter
 function findGetParameter(parameterName) {

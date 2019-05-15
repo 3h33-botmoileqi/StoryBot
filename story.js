@@ -182,7 +182,7 @@ class Story {
 				this.playStory(this.id);
 			}
 			var notifAudio = document.getElementById('notifAudio');
-			notifAudio.currentTime=0;
+			notifAudio.currentTime = 0;
 			if(notifAudio.paused){
 				notifAudio.play();
 			}
