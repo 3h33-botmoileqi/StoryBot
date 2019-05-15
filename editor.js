@@ -466,7 +466,7 @@ class Editor extends Story{
 	insertMessageEditor(id, message){
 		$("#messageList>li").last().before(this.messageItemDom(message, id));
 		this.conversation.splice(id,0 ,message);
-		saveStory();
+		this.saveStory();
 	}
 
 	/**

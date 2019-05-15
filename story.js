@@ -181,9 +181,10 @@ class Story {
 				this.tapeRequiredFlag = false;
 				this.playStory(this.id);
 			}
-			document.getElementById('notifAudio').currentTime=0;
-			if(document.getElementById('notifAudio').paused){
-				document.getElementById('notifAudio').play();
+			var notifAudio = document.getElementById('notifAudio');
+			notifAudio.currentTime=0;
+			if(notifAudio.paused){
+				notifAudio.play();
 			}
 		}
 		catch(err){

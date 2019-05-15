@@ -59,12 +59,12 @@ var messageContentDropzone = new Dropzone("#MessageDropzone", {
 
 messageContentDropzone.on("addedfile", function(file){
   var reader = new FileReader();
-  if (MessageContentDropzone.files.length < 4 ) {
+  if (messageContentDropzone.files.length < 4 ) {
       reader.onload = function(event) {
          // event.target.result contains base64 encoded image
         console.log("file being uploaded ")
         console.log(file);
-        storage_upload(event.target.result, file, MessageContentDropzone ,(r)=>{
+        storage_upload(event.target.result, file, messageContentDropzone ,(r)=>{
           console.log("Storage upload response")
           console.log(r)
           $('input[name="payload-url"]').val(r.publicURL);
