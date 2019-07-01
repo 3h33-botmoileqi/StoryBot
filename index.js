@@ -159,7 +159,7 @@ function createNewStory(){
       conversation: []
   }).then(doc => {
     //Redirect to editor with new id
-    window.location.replace("http://storybot/editor?id="+doc.id);
+    window.location.replace("./editor?id="+doc.id);
   })
   .catch(err => {
       console.log('Error adding document', err);
