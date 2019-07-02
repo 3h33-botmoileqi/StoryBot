@@ -112,7 +112,7 @@ class Editor extends Story{
 					var doc = snapshot.docs[0];
 					if(this.authors.findIndex(ref => ref.id === doc.id) == -1){
 						this.authors.push(doc.id);
-						let authorItem = this.authorItemDom(author, doc.id);
+						let authorItem = this.authorDOMElement(author, doc.id);
 						$("#authorsList").append(authorItem);
 						if(this.storyRef){
 							db.collection("stories").doc(this.storyRef).update({
